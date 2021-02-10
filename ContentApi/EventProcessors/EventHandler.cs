@@ -1,18 +1,16 @@
-// using System.Threading.Tasks;
-// using TbspRpgLib.Aggregates;
-// using TbspRpgLib.Events;
-// using GameApi.Adapters;
+using System.Threading.Tasks;
+using TbspRpgLib.Aggregates;
+using TbspRpgLib.Events;
 
-// namespace GameApi.EventProcessors {
-//     public interface IEventHandler {
-//         Task HandleEvent(GameAggregate gameAggregate, Event evnt);
-//     }
+namespace ContentApi.EventProcessors {
+    public interface IEventHandler {
+        Task HandleEvent(GameAggregate gameAggregate, Event evnt);
+    }
 
-//     public class EventHandler {
-//         protected IGameAggregateAdapter _gameAdapter;
+    public class EventHandler {
 
-//         public EventHandler() {
-//             _gameAdapter = new GameAggregateAdapter();
-//         }
-//     }
-// }
+        public EventHandler() {
+            
+        }
+    }
+}

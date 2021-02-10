@@ -1,30 +1,23 @@
-// using System;
-// using System.Threading.Tasks;
+using System;
+using System.Threading.Tasks;
 
-// using TbspRpgLib.Aggregates;
-// using TbspRpgLib.Events;
+using TbspRpgLib.Aggregates;
+using TbspRpgLib.Events;
 
-// using GameApi.Services;
-// using GameApi.Entities;
+namespace ContentApi.EventProcessors {
+    public interface INewGameEventHandler : IEventHandler {
 
-// namespace GameApi.EventProcessors {
-//     public interface INewGameEventHandler : IEventHandler {
+    }
 
-//     }
+    public class NewGameEventHandler : EventHandler, INewGameEventHandler {
 
-//     public class NewGameEventHandler : EventHandler, INewGameEventHandler {
-//         private IGameLogic _gameLogic;
+        public NewGameEventHandler() : base() {
+            
+        }
 
-//         public NewGameEventHandler(IGameLogic gameLogic) : base() {
-//             _gameLogic = gameLogic;
-//         }
+        public async Task HandleEvent(GameAggregate gameAggregate, Event evnt) {
+            //need to create a new event stream that will be the content for this game
 
-//         public async Task HandleEvent(GameAggregate gameAggregate, Event evnt) {
-//             Game game = _gameAdapter.ToEntity(gameAggregate);
-//             Console.WriteLine($"Writing Game {game.Id} {gameAggregate.GlobalPosition}!!");
-
-//             //update the game
-//             await _gameLogic.AddGame(game);
-//         }
-//     }
-// }
+        }
+    }
+}
