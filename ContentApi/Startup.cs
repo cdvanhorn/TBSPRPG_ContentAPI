@@ -11,8 +11,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.EntityFrameworkCore;
 
 using TbspRpgLib;
+
+using ContentApi.Repositories;
+using ContentApi.Services;
 
 namespace ContentApi
 {
@@ -30,6 +34,16 @@ namespace ContentApi
         {
             services.AddControllers();
             LibStartup.ConfigureTbspRpgServices(Configuration, services);
+
+            var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+
+            services.AddDbContext<ContentContext>(
+                options => options.UseNpgsql(connectionString)
+            );
+
+            services.AddScoped<IContentRepository, ContentRepository>();
+            services.AddScoped<IContentService, ContentService>();
+
 
             //start workers
             //services.AddHostedService<MyNewGameEventProcessor>();
