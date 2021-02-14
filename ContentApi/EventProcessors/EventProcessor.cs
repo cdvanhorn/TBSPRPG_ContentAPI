@@ -50,14 +50,12 @@ namespace ContentApi.EventProcessors
                         return;
 
                     //figure out what handler to call based on event type
-                    // IEventHandler handler = null;
-                    // if(eventType.TypeName == Event.GAME_NEW_EVENT_TYPE) {
-                    //     handler = scope.ServiceProvider.GetRequiredService<INewGameEventHandler>();
-                    // } else if(eventType.TypeName == Event.LOCATION_ENTER_EVENT_TYPE) {
-                    //     handler = scope.ServiceProvider.GetRequiredService<IEnterLocationEventHandler>();
-                    // }
-                    // if(handler != null)
-                    //     await handler.HandleEvent(gameAggregate, evnt);
+                    IEventHandler handler = null;
+                    if(eventType.TypeName == Event.GAME_NEW_EVENT_TYPE) {
+                        handler = scope.ServiceProvider.GetRequiredService<INewGameEventHandler>();
+                    }
+                    if(handler != null)
+                        await handler.HandleEvent(gameAggregate, evnt);
 
                     //update the event type position and this event is processed
                     await service.UpdatePosition(eventType.Id, gameAggregate.GlobalPosition);

@@ -17,6 +17,7 @@ using TbspRpgLib;
 
 using ContentApi.Repositories;
 using ContentApi.Services;
+using ContentApi.EventProcessors;
 
 namespace ContentApi
 {
@@ -43,10 +44,10 @@ namespace ContentApi
 
             services.AddScoped<IContentRepository, ContentRepository>();
             services.AddScoped<IContentService, ContentService>();
-
+            services.AddScoped<INewGameEventHandler, NewGameEventHandler>();
 
             //start workers
-            //services.AddHostedService<MyNewGameEventProcessor>();
+            services.AddHostedService<EventProcessor>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
