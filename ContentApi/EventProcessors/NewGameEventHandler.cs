@@ -11,22 +11,17 @@ namespace ContentApi.EventProcessors {
     }
 
     public class NewGameEventHandler : EventHandler, INewGameEventHandler {
-        protected IEventService _eventService;
 
-        public NewGameEventHandler(IEventService eventService) : base() {
-            _eventService = eventService;
+        public NewGameEventHandler(IEventService eventService) : base(eventService) {
         }
 
         public async Task HandleEvent(GameAggregate gameAggregate, Event evnt) {
             //need to create a new event stream that will be the content for this game
             //will eventually call the adventure api to get the opening credits
             //for now create a new content event and send it
-            ContentContent eventContent = new ContentContent();
-            eventContent.Id = gameAggregate.Id;
-            eventContent.Text = $"New game started with id {gameAggregate.Id} of adventure {gameAggregate.AdventureId}";
-            var contentEvent = new ContentEvent(eventContent);
-            //this should be a new stream
-            await _eventService.SendEvent(contentEvent, true);
+            var eventId = gameAggregate.Id;
+            var eventText = $"New game started with id {gameAggregate.Id} of adventure {gameAggregate.AdventureId}";
+            await SendContentEvent(eventId, eventText, true);
         }
     }
 }

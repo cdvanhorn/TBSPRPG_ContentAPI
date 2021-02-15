@@ -24,7 +24,9 @@ namespace ContentApi.EventProcessors
                 base(
                     "game",
                     new string[] {
-                        Event.GAME_NEW_EVENT_TYPE
+                        Event.GAME_NEW_EVENT_TYPE,
+                        Event.LOCATION_ENTER_FAIL_EVENT_TYPE,
+                        Event.LOCATION_ENTER_PASS_EVENT_TYPE
                     },
                     eventStoreSettings
                 )
@@ -51,9 +53,12 @@ namespace ContentApi.EventProcessors
 
                     //figure out what handler to call based on event type
                     IEventHandler handler = null;
-                    if(eventType.TypeName == Event.GAME_NEW_EVENT_TYPE) {
+                    if(eventType.TypeName == Event.GAME_NEW_EVENT_TYPE)
                         handler = scope.ServiceProvider.GetRequiredService<INewGameEventHandler>();
-                    }
+                    else if(eventType.TypeName == Event.LOCATION_ENTER_PASS_EVENT_TYPE)
+                        handler = scope.ServiceProvider.GetRequiredService<ILocationEnterPassHandler>();
+                    else if(eventType.TypeName == Event.LOCATION_ENTER_FAIL_EVENT_TYPE)
+                        handler = scope.ServiceProvider.GetRequiredService<ILocationEnterFailHandler>();
                     if(handler != null)
                         await handler.HandleEvent(gameAggregate, evnt);
 

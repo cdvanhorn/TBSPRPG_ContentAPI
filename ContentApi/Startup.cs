@@ -45,6 +45,8 @@ namespace ContentApi
             services.AddScoped<IContentRepository, ContentRepository>();
             services.AddScoped<IContentService, ContentService>();
             services.AddScoped<INewGameEventHandler, NewGameEventHandler>();
+            services.AddScoped<ILocationEnterPassHandler, LocationEnterPassHandler>();
+            services.AddScoped<ILocationEnterFailHandler, LocationEnterFailHandler>();
 
             //start workers
             services.AddHostedService<EventProcessor>();
