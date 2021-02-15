@@ -14,6 +14,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
 
 using TbspRpgLib;
+using TbspRpgLib.Aggregates;
 
 using ContentApi.Repositories;
 using ContentApi.Services;
@@ -47,6 +48,7 @@ namespace ContentApi
             services.AddScoped<INewGameEventHandler, NewGameEventHandler>();
             services.AddScoped<ILocationEnterPassHandler, LocationEnterPassHandler>();
             services.AddScoped<ILocationEnterFailHandler, LocationEnterFailHandler>();
+            services.AddScoped<IAggregateService, AggregateService>();
 
             //start workers
             services.AddHostedService<EventProcessor>();
