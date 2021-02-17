@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 namespace ContentApi.Services {
     public interface IContentService : IServiceTrackingService {
         Task<ContentViewModel> GetAllContentForGame(string gameId);
+        Task<ContentViewModel> GetLatestForGame(string gameId);
     }
 
     public class ContentService : ServiceTrackingService, IContentService {
@@ -24,6 +25,11 @@ namespace ContentApi.Services {
         public async Task<ContentViewModel> GetAllContentForGame(string gameId) {
             //need to fix this hard coding
             var agg = await _aggregateService.BuildAggregate($"content_{gameId}","ContentAggregate");
+            return new ContentViewModel((ContentAggregate)agg);
+        }
+
+        public async Task<ContentViewModel> GetLatestForGame(string gameId) {
+            var agg = await _aggregateService.BuildPartialAggregateLatest($"content_{gameId}", "ContentAggregate");
             return new ContentViewModel((ContentAggregate)agg);
         }
     }

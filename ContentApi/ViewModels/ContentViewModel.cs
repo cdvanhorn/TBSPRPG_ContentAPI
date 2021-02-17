@@ -6,7 +6,7 @@ namespace ContentApi.ViewModels {
     public class ContentViewModel {
         public ContentViewModel(ContentAggregate agg) {
             Id = agg.Id;
-            Texts = new List<string>(agg.Text.Split('\n'));
+            Texts = agg.Text;
         }
 
         public string Id { get; set; }

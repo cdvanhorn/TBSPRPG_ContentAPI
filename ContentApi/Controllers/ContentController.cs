@@ -22,6 +22,13 @@ namespace ContentApi.Controllers {
             return Ok(content);
         }
 
+        [Authorize]
+        [Route("latest/{gameid}")]
+        public async Task<IActionResult> GetLatestForGame(string gameid) {
+            var content = await _contentService.GetLatestForGame(gameid);
+            return Ok(content);
+        }
+
         // [Authorize]
         // [Route("initiallocation/{id}")]
         // public async Task<IActionResult> GetInitialLocation(string id) {
