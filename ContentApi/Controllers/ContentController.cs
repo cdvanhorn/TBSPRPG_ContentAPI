@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
 using ContentApi.Services;
+using ContentApi.ViewModels;
 
 namespace ContentApi.Controllers {
 
@@ -26,6 +27,13 @@ namespace ContentApi.Controllers {
         [Route("latest/{gameid}")]
         public async Task<IActionResult> GetLatestForGame(string gameid) {
             var content = await _contentService.GetLatestForGame(gameid);
+            return Ok(content);
+        }
+
+        [Authorize]
+        [Route("filter/{gameid}")]
+        public async Task<IActionResult> FilterContent(string gameid, ContentFilterRequest filterRequest) {
+            var content = await _contentService.GetPartialContentForGame(gameid, filterRequest);
             return Ok(content);
         }
 
