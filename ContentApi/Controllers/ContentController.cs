@@ -31,8 +31,8 @@ namespace ContentApi.Controllers {
         }
 
         [Authorize]
-        [Route("filter/{gameid}")]
-        public async Task<IActionResult> FilterContent(string gameid, ContentFilterRequest filterRequest) {
+        [HttpGet("filter/{gameid}")]
+        public async Task<IActionResult> FilterContent(string gameid, [FromQuery] ContentFilterRequest filterRequest) {
             var content = await _contentService.GetPartialContentForGame(gameid, filterRequest);
             return Ok(content);
         }
