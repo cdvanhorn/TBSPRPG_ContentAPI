@@ -50,7 +50,7 @@ namespace ContentApi.Services {
                     agg = await _aggregateService.BuildPartialAggregate(
                         $"content_{gameId}",
                         "ContentAggregate",
-                        filterRequest.Start.GetValueOrDefault()
+                        (ulong)filterRequest.Start.GetValueOrDefault()
                     );
                 } else if(filterRequest.Start == null && filterRequest.Count != null) {
                     //we're starting at the beginning and reading given count
@@ -66,7 +66,7 @@ namespace ContentApi.Services {
                     agg = await _aggregateService.BuildPartialAggregate(
                         $"content_{gameId}",
                         "ContentAggregate",
-                        filterRequest.Start.GetValueOrDefault(),
+                        (ulong)filterRequest.Start.GetValueOrDefault(),
                         filterRequest.Count.GetValueOrDefault()
                     );
                 }
@@ -74,6 +74,10 @@ namespace ContentApi.Services {
                 //direction specified and it's backward
                 if(filterRequest.Start == null && filterRequest.Count == null) {
                     //no start specified so start at end and read everything
+                    agg = await _aggregateService.BuildAggregateReverse(
+                        $"content_{gameId}",
+                        "ContentAggregate"
+                    );
                 } else if(filterRequest.Start != null && filterRequest.Count == null) {
                     //there is a start and we're reading to the beginning
                     agg = await _aggregateService.BuildPartialAggregateReverse(
@@ -82,7 +86,13 @@ namespace ContentApi.Services {
                         filterRequest.Start.GetValueOrDefault()
                     );
                 } else if(filterRequest.Start == null && filterRequest.Count != null) {
-                    //we're starting at the end and reading given count
+                    //we're starting at the end and reading given count, how do I get the last position
+                    agg = await _aggregateService.BuildPartialAggregateReverse(
+                        $"content_{gameId}",
+                        "ContentAggregate",
+                        -1,
+                        filterRequest.Count.GetValueOrDefault()
+                    );
                 } else {
                     // they're both not null
                     //we have a start point and a count

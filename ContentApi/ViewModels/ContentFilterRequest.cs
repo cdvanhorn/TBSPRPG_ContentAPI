@@ -6,7 +6,7 @@ namespace ContentApi.ViewModels {
         public string Direction { get; set; }
         
         [FromQuery(Name = "start")]
-        public ulong? Start { get; set; }
+        public long? Start { get; set; }
         
         [FromQuery(Name = "count")]
         public long? Count { get; set; }
