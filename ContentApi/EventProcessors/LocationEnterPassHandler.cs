@@ -8,7 +8,7 @@ namespace ContentApi.EventProcessors {
 
     }
     public class LocationEnterPassHandler : EventHandler, ILocationEnterPassHandler {
-        public LocationEnterPassHandler(IEventService eventService) : base(eventService) {
+        public LocationEnterPassHandler(IAggregateService aggregateService) : base(aggregateService) {
         }
 
         public async Task HandleEvent(GameAggregate gameAggregate, Event evnt) {

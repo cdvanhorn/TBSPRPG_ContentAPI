@@ -9,10 +9,10 @@ namespace ContentApi.EventProcessors {
     }
 
     public class EventHandler {
-        protected IEventService _eventService;
+        protected IAggregateService _aggregateService;
 
-        public EventHandler(IEventService eventService) {
-            _eventService = eventService;
+        public EventHandler(IAggregateService aggregateService) {
+            _aggregateService = aggregateService;
         }
 
         protected async Task SendContentEvent(string eventId, string text, bool streamNew) {
@@ -20,10 +20,15 @@ namespace ContentApi.EventProcessors {
             eventContent.Id = eventId;
             eventContent.Text = text;
             var contentEvent = new ContentEvent(eventContent);
-            if(streamNew)
-                await _eventService.SendEvent(contentEvent, true);
-            else
-                await _eventService.SendEvent(contentEvent, false);
+            await _aggregateService.AppendToAggregate(
+                    AggregateService.CONTENT_AGGREGATE_TYPE,
+                    contentEvent,
+                    streamNew);
+
+            // if(streamNew)
+            //     await _eventService.SendEvent(contentEvent, true);
+            // else
+            //     await _eventService.SendEvent(contentEvent, false);
         }
     }
 }

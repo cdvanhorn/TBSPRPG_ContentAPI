@@ -12,7 +12,7 @@ namespace ContentApi.EventProcessors {
 
     public class NewGameEventHandler : EventHandler, INewGameEventHandler {
 
-        public NewGameEventHandler(IEventService eventService) : base(eventService) {
+        public NewGameEventHandler(IAggregateService aggregateService) : base(aggregateService) {
         }
 
         public async Task HandleEvent(GameAggregate gameAggregate, Event evnt) {
