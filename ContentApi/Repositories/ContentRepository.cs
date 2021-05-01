@@ -6,7 +6,7 @@ namespace ContentApi.Repositories {
     }
 
     public class ContentRepository : ServiceTrackingRepository, IContentRepository {
-        private ContentContext _context;
+        private readonly ContentContext _context;
 
         public ContentRepository(ContentContext context) : base(context) {
             _context = context;

@@ -9,32 +9,47 @@ using System.Threading.Tasks;
 
 namespace ContentApi.Services {
     public interface IContentService : IServiceTrackingService {
-        Task<ContentViewModel> GetAllContentForGame(string gameId);
-        Task<ContentViewModel> GetLatestForGame(string gameId);
-        Task<ContentViewModel> GetPartialContentForGame(string gameId, ContentFilterRequest filterRequest);
+        Task<ContentViewModel> GetAllContentForGame(Guid gameId);
+        Task<ContentViewModel> GetLatestForGame(Guid gameId);
+        Task<ContentViewModel> GetPartialContentForGame(Guid gameId, ContentFilterRequest filterRequest);
     }
 
     public class ContentService : ServiceTrackingService, IContentService {
-        private IContentRepository _repository;
-        private IAggregateService _aggregateService;
+        private readonly IContentRepository _repository;
+        private readonly IAggregateService _aggregateService;
 
         public ContentService(IContentRepository repository, IAggregateService aggregateService) : base(repository) {
             _repository = repository;
             _aggregateService = aggregateService;
         }
 
-        public async Task<ContentViewModel> GetAllContentForGame(string gameId) {
+        public Task<ContentViewModel> GetAllContentForGame(Guid gameId)
+        {
+            return GetAllContentForGame(gameId.ToString());
+        }
+
+        private async Task<ContentViewModel> GetAllContentForGame(string gameId) {
             //need to fix this hard coding
             var agg = await _aggregateService.BuildAggregate($"content_{gameId}","ContentAggregate");
             return new ContentViewModel((ContentAggregate)agg);
         }
 
-        public async Task<ContentViewModel> GetLatestForGame(string gameId) {
+        public Task<ContentViewModel> GetLatestForGame(Guid gameId)
+        {
+            return GetLatestForGame(gameId.ToString());
+        }
+
+        private async Task<ContentViewModel> GetLatestForGame(string gameId) {
             var agg = await _aggregateService.BuildPartialAggregateLatest($"content_{gameId}", "ContentAggregate");
             return new ContentViewModel((ContentAggregate)agg);
         }
 
-        public async Task<ContentViewModel> GetPartialContentForGame(string gameId, ContentFilterRequest filterRequest) {
+        public Task<ContentViewModel> GetPartialContentForGame(Guid gameId, ContentFilterRequest filterRequest)
+        {
+            return GetPartialContentForGame(gameId.ToString(), filterRequest);
+        }
+
+        private async Task<ContentViewModel> GetPartialContentForGame(string gameId, ContentFilterRequest filterRequest) {
             Aggregate agg = null;
 
             if(filterRequest.Direction == null || (filterRequest.Direction != null && filterRequest.IsForward())) {

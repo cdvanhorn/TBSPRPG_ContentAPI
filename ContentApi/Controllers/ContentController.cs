@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Mvc;
 
 using System.Threading.Tasks;
@@ -6,34 +7,29 @@ using ContentApi.Services;
 using ContentApi.ViewModels;
 
 namespace ContentApi.Controllers {
-
-    [ApiController]
-    [Route("/api/[controller]")]
+    [ApiController, Route("/api/[controller]")]
     public class ContentController : ControllerBase {
-        IContentService _contentService;
+        private readonly IContentService _contentService;
 
         public ContentController(IContentService contentService) {
             _contentService = contentService;
         }
 
-        [Authorize]
-        [HttpGet("{gameid}")]
-        public async Task<IActionResult> GetForGame(string gameid) {
-            var content = await _contentService.GetAllContentForGame(gameid);
+        [Authorize, HttpGet("{gameId:guid}")]
+        public async Task<IActionResult> GetForGame(Guid gameId) {
+            var content = await _contentService.GetAllContentForGame(gameId);
             return Ok(content);
         }
 
-        [Authorize]
-        [Route("latest/{gameid}")]
-        public async Task<IActionResult> GetLatestForGame(string gameid) {
-            var content = await _contentService.GetLatestForGame(gameid);
+        [Authorize, Route("latest/{gameId:guid}")]
+        public async Task<IActionResult> GetLatestForGame(Guid gameId) {
+            var content = await _contentService.GetLatestForGame(gameId);
             return Ok(content);
         }
 
-        [Authorize]
-        [HttpGet("filter/{gameid}")]
-        public async Task<IActionResult> FilterContent(string gameid, [FromQuery] ContentFilterRequest filterRequest) {
-            var content = await _contentService.GetPartialContentForGame(gameid, filterRequest);
+        [Authorize, HttpGet("filter/{gameId:guid}")]
+        public async Task<IActionResult> FilterContent(Guid gameId, [FromQuery] ContentFilterRequest filterRequest) {
+            var content = await _contentService.GetPartialContentForGame(gameId, filterRequest);
             return Ok(content);
         }
 
