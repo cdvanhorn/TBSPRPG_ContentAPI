@@ -75,6 +75,7 @@ namespace ContentApi.Tests
                 Text = contents.Skip((int)start).Take((int)count).ToList()
             });
 
+            //reverse aggregate methods
             aggregateService.Setup(service =>
                 service.BuildAggregateReverse(
                     It.IsAny<string>(),
@@ -99,6 +100,7 @@ namespace ContentApi.Tests
                 string aggregateTypeName,
                 long start) =>
             {
+                start = start < 0 ? 1 - (start * -1) : start;
                 contents.Reverse();
                 return new ContentAggregate()
                 {
@@ -118,6 +120,7 @@ namespace ContentApi.Tests
                 long start,
                 long count) =>
             {
+                start = start < 0 ? 1 - (start * -1) : start;
                 contents.Reverse();
                 return new ContentAggregate()
                 {

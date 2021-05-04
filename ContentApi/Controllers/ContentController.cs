@@ -32,14 +32,5 @@ namespace ContentApi.Controllers {
             var content = await _contentService.GetPartialContentForGame(gameId, filterRequest);
             return Ok(content);
         }
-
-        // [Authorize]
-        // [Route("initiallocation/{id}")]
-        // public async Task<IActionResult> GetInitialLocation(string id) {
-        //     var loc = await _locationService.GetInitialForLocation(id);
-        //     if(loc == null)
-        //         return BadRequest(new { message = "invalid game id" });
-        //     return Ok(loc);
-        // }
     }
 }
