@@ -100,7 +100,7 @@ namespace ContentApi.Tests
                 string aggregateTypeName,
                 long start) =>
             {
-                start = start < 0 ? 1 - (start * -1) : start;
+                start = start < 0 ? ((start * -1) - 1): start;
                 contents.Reverse();
                 return new ContentAggregate()
                 {
@@ -120,7 +120,7 @@ namespace ContentApi.Tests
                 long start,
                 long count) =>
             {
-                start = start < 0 ? 1 - (start * -1) : start;
+                start = start < 0 ? ((start * -1) - 1): start;
                 contents.Reverse();
                 return new ContentAggregate()
                 {

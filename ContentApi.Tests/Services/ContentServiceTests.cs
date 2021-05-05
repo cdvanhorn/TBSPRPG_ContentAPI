@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ContentApi.Repositories;
 using ContentApi.Services;
+using ContentApi.ViewModels;
 using TbspRpgLib.Events;
 using Xunit;
 
@@ -90,6 +91,14 @@ namespace ContentApi.Tests.Services
             var contents = new List<string>();
             contents.AddRange(new string[] { "one", "two", "three", "four", "five" });
             var service = CreateService(context, null, contents);
+            
+            //act
+            var gameContents = await service.GetPartialContentForGame(_testGameId, new ContentFilterRequest());
+            
+            //assert
+            Assert.Equal(_testGameId.ToString(), gameContents.Id);
+            Assert.Equal(5, gameContents.Texts.Count);
+            Assert.Equal("one", gameContents.Texts[0]);
         }
         
         [Fact]
@@ -100,6 +109,17 @@ namespace ContentApi.Tests.Services
             var contents = new List<string>();
             contents.AddRange(new string[] { "one", "two", "three", "four", "five" });
             var service = CreateService(context, null, contents);
+            
+            //act
+            var gameContents = await service.GetPartialContentForGame(_testGameId, new ContentFilterRequest()
+            {
+                Direction = "f"
+            });
+            
+            //assert
+            Assert.Equal(_testGameId.ToString(), gameContents.Id);
+            Assert.Equal(5, gameContents.Texts.Count);
+            Assert.Equal("one", gameContents.Texts[0]);
         }
         
         [Fact]
@@ -110,6 +130,18 @@ namespace ContentApi.Tests.Services
             var contents = new List<string>();
             contents.AddRange(new string[] { "one", "two", "three", "four", "five" });
             var service = CreateService(context, null, contents);
+            
+            //act
+            var gameContents = await service.GetPartialContentForGame(_testGameId, new ContentFilterRequest()
+            {
+                Direction = "f",
+                Start = 2
+            });
+            
+            //assert
+            Assert.Equal(_testGameId.ToString(), gameContents.Id);
+            Assert.Equal(3, gameContents.Texts.Count);
+            Assert.Equal("three", gameContents.Texts[0]);
         }
         
         [Fact]
@@ -120,6 +152,19 @@ namespace ContentApi.Tests.Services
             var contents = new List<string>();
             contents.AddRange(new string[] { "one", "two", "three", "four", "five" });
             var service = CreateService(context, null, contents);
+            
+            //act
+            var gameContents = await service.GetPartialContentForGame(_testGameId, new ContentFilterRequest()
+            {
+                Direction = "f",
+                Start = 3,
+                Count = 2
+            });
+            
+            //assert
+            Assert.Equal(_testGameId.ToString(), gameContents.Id);
+            Assert.Equal(2, gameContents.Texts.Count);
+            Assert.Equal("four", gameContents.Texts[0]);
         }
         
         [Fact]
@@ -130,6 +175,18 @@ namespace ContentApi.Tests.Services
             var contents = new List<string>();
             contents.AddRange(new string[] { "one", "two", "three", "four", "five" });
             var service = CreateService(context, null, contents);
+            
+            //act
+            var gameContents = await service.GetPartialContentForGame(_testGameId, new ContentFilterRequest()
+            {
+                Direction = "f",
+                Count = 2
+            });
+            
+            //assert
+            Assert.Equal(_testGameId.ToString(), gameContents.Id);
+            Assert.Equal(2, gameContents.Texts.Count);
+            Assert.Equal("one", gameContents.Texts[0]);
         }
         
         [Fact]
@@ -140,6 +197,17 @@ namespace ContentApi.Tests.Services
             var contents = new List<string>();
             contents.AddRange(new string[] { "one", "two", "three", "four", "five" });
             var service = CreateService(context, null, contents);
+            
+            //act
+            var gameContents = await service.GetPartialContentForGame(_testGameId, new ContentFilterRequest()
+            {
+                Direction = "b"
+            });
+            
+            //assert
+            Assert.Equal(_testGameId.ToString(), gameContents.Id);
+            Assert.Equal(5, gameContents.Texts.Count);
+            Assert.Equal("five", gameContents.Texts[0]);
         }
         
         [Fact]
@@ -150,6 +218,18 @@ namespace ContentApi.Tests.Services
             var contents = new List<string>();
             contents.AddRange(new string[] { "one", "two", "three", "four", "five" });
             var service = CreateService(context, null, contents);
+            
+            //act
+            var gameContents = await service.GetPartialContentForGame(_testGameId, new ContentFilterRequest()
+            {
+                Direction = "b",
+                Start = -2
+            });
+            
+            //assert
+            Assert.Equal(_testGameId.ToString(), gameContents.Id);
+            Assert.Equal(4, gameContents.Texts.Count);
+            Assert.Equal("four", gameContents.Texts[0]);
         }
         
         [Fact]
@@ -160,6 +240,18 @@ namespace ContentApi.Tests.Services
             var contents = new List<string>();
             contents.AddRange(new string[] { "one", "two", "three", "four", "five" });
             var service = CreateService(context, null, contents);
+            
+            //act
+            var gameContents = await service.GetPartialContentForGame(_testGameId, new ContentFilterRequest()
+            {
+                Direction = "b",
+                Count = 2
+            });
+            
+            //assert
+            Assert.Equal(_testGameId.ToString(), gameContents.Id);
+            Assert.Equal(2, gameContents.Texts.Count);
+            Assert.Equal("five", gameContents.Texts[0]);
         }
         
         [Fact]
@@ -170,6 +262,19 @@ namespace ContentApi.Tests.Services
             var contents = new List<string>();
             contents.AddRange(new string[] { "one", "two", "three", "four", "five" });
             var service = CreateService(context, null, contents);
+            
+            //act
+            var gameContents = await service.GetPartialContentForGame(_testGameId, new ContentFilterRequest()
+            {
+                Direction = "b",
+                Start = -3,
+                Count = 2
+            });
+            
+            //assert
+            Assert.Equal(_testGameId.ToString(), gameContents.Id);
+            Assert.Equal(2, gameContents.Texts.Count);
+            Assert.Equal("three", gameContents.Texts[0]);
         }
         
         [Fact]
