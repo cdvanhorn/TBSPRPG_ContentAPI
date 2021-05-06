@@ -118,14 +118,17 @@ namespace ContentApi.Services {
                         filterRequest.Count.GetValueOrDefault()
                     );
                 }
-            } else if(filterRequest.Direction != null) {
-                //direction specified but not parsable, log error, return bad request
+            } else if(filterRequest.Direction != null)
+            {
+                throw new ArgumentException($"invalid direction {filterRequest.Direction}");
             } else {
                 //we shouldn't be here, log error, return a bad request
+                throw new ArgumentException("¯/_(ツ)_/¯");
             }
 
             if(agg == null) {
                 //log error, return a bad request, this shouldn't happen, even if there are no content events
+                throw new Exception("invalid response from aggregate service");
             }
 
             return new ContentViewModel((ContentAggregate)agg);

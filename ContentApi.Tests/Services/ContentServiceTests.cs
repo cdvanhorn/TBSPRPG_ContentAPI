@@ -285,6 +285,16 @@ namespace ContentApi.Tests.Services
             var contents = new List<string>();
             contents.AddRange(new string[] { "one", "two", "three", "four", "five" });
             var service = CreateService(context, null, contents);
+
+            //act
+            //assert
+            var exception = Assert.ThrowsAsync<ArgumentException>(() =>
+                service.GetPartialContentForGame(_testGameId, new ContentFilterRequest()
+                {
+                    Direction = "zebra",
+                    Start = -3,
+                    Count = 2
+                }));
         }
         
         #endregion
