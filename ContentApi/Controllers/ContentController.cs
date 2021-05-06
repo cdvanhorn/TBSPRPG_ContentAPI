@@ -29,8 +29,15 @@ namespace ContentApi.Controllers {
 
         [Authorize, HttpGet("filter/{gameId:guid}")]
         public async Task<IActionResult> FilterContent(Guid gameId, [FromQuery] ContentFilterRequest filterRequest) {
-            var content = await _contentService.GetPartialContentForGame(gameId, filterRequest);
-            return Ok(content);
+            try
+            {
+                var content = await _contentService.GetPartialContentForGame(gameId, filterRequest);
+                return Ok(content);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { message = "invalid filter arguments" });
+            }
         }
     }
 }
