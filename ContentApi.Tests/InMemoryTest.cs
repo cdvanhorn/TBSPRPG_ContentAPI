@@ -35,6 +35,13 @@ namespace ContentApi.Tests
                 events.Add(evnt);
             });
             
+            aggregateService.Setup(service =>
+                service.AppendToAggregate(It.IsAny<string>(), It.IsAny<Event>(), It.IsAny<bool>())
+            ).Callback<string, Event, bool>((type, evnt, n) =>
+            {
+                events.Add(evnt);
+            });
+            
             //aggregate building methods
             aggregateService.Setup(service =>
                 service.BuildPartialAggregateLatest(It.IsAny<string>(), It.IsAny<string>())

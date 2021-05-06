@@ -19,8 +19,4 @@
     <ProjectReference Include="..\ContentApi\ContentApi.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="EventProcessors" />
-  </ItemGroup>
-
 </Project>
