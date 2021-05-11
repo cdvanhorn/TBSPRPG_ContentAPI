@@ -5,6 +5,10 @@ using TbspRpgLib.Repositories;
 namespace ContentApi.Repositories {
     public class ContentContext : ServiceTrackingContext {
         public ContentContext(DbContextOptions<ContentContext> options) : base(options){}
+        
+        public DbSet<Content> Contents { get; set; }
+
+        public DbSet<Game> Games { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
