@@ -11,6 +11,8 @@ namespace ContentApi.Repositories
     {
         Task<List<Game>> GetAllGames();
         Task<Game> GetGameById(Guid gameId);
+        void AddGame(Game game);
+        void SaveChanges();
     }
     
     public class GameRepository : IGameRepository
@@ -30,6 +32,16 @@ namespace ContentApi.Repositories
         public Task<Game> GetGameById(Guid gameId)
         {
             return _context.Games.AsQueryable().Where(g => g.Id == gameId).FirstOrDefaultAsync();
+        }
+
+        public void AddGame(Game game)
+        {
+            _context.Games.Add(game);
+        }
+
+        public void SaveChanges()
+        {
+            _context.SaveChanges();
         }
     }
 }
