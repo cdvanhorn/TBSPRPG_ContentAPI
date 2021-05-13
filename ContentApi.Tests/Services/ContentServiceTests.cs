@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ContentApi.Entities;
 using ContentApi.Repositories;
 using ContentApi.Services;
 using ContentApi.ViewModels;
@@ -13,8 +14,13 @@ namespace ContentApi.Tests.Services
     {
         #region Setup
         
+        private readonly Guid _testContentId;
+        private readonly string _contentOne = "first content";
+        private readonly string _contentTwo = "second content";
+        private readonly string _contentLatest = "latest content";
         public ContentServiceTests() : base("ContentServiceTests")
         {
+            _testContentId = Guid.NewGuid();
             Seed();
         }
 
@@ -24,15 +30,46 @@ namespace ContentApi.Tests.Services
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
 
+            var tc = new Content()
+            {
+                Id = _testContentId,
+                GameId = _testGameId,
+                Position = 42,
+                Text = _contentLatest
+            };
+
+            var tc2 = new Content()
+            {
+                Id = Guid.NewGuid(),
+                GameId = _testGameId,
+                Position = 0,
+                Text = _contentOne
+            };
+
+            var tc3 = new Content()
+            {
+                Id = Guid.NewGuid(),
+                GameId = _testGameId,
+                Position = 1,
+                Text = _contentTwo
+            };
+
+            var tc4 = new Content()
+            {
+                Id = Guid.NewGuid(),
+                GameId = Guid.NewGuid(),
+                Position = 43,
+                Text = "other game content"
+            };
+            
+            context.Contents.AddRange(tc, tc2, tc3, tc4);
             context.SaveChanges();
         }
 
-        private ContentService CreateService(ContentContext context, ICollection<Event> events, List<string> contents)
+        private ContentService CreateService(ContentContext context)
         {
             var repository = new ContentRepository(context);
-            return new ContentService(
-                repository,
-                MockAggregateService(events, contents));
+            return new ContentService(repository);
         }
         
         #endregion
@@ -44,17 +81,15 @@ namespace ContentApi.Tests.Services
         {
             //arrange
             await using var context = new ContentContext(_dbContextOptions);
-            var contents = new List<string>();
-            contents.AddRange(new string[] { "one", "two", "three", "four", "five" });
-            var service = CreateService(context, null, contents);
+            var service = CreateService(context);
             
             //act
             var gameContents = await service.GetAllContentForGame(_testGameId);
             
             //assert
-            Assert.Equal(_testGameId.ToString(), gameContents.Id);
-            Assert.Equal(5, gameContents.Texts.Count);
-            Assert.Equal("one", gameContents.Texts[0]);
+            Assert.Equal(_testGameId, gameContents.Id);
+            Assert.Equal(3, gameContents.Texts.Count);
+            Assert.Equal(_contentOne, gameContents.Texts[0]);
         }
 
         #endregion
@@ -66,17 +101,15 @@ namespace ContentApi.Tests.Services
         {
             //arrange
             await using var context = new ContentContext(_dbContextOptions);
-            var contents = new List<string>();
-            contents.AddRange(new string[] { "one", "two", "three", "four", "five" });
-            var service = CreateService(context, null, contents);
+            var service = CreateService(context);
             
             //act
             var gameContents = await service.GetLatestForGame(_testGameId);
             
             //assert
-            Assert.Equal(_testGameId.ToString(), gameContents.Id);
+            Assert.Equal(_testGameId, gameContents.Id);
             Assert.Single(gameContents.Texts);
-            Assert.Equal("five", gameContents.Texts.First());
+            Assert.Equal(_contentLatest, gameContents.Texts.First());
         }
 
         #endregion
@@ -88,17 +121,15 @@ namespace ContentApi.Tests.Services
         {
             //arrange
             await using var context = new ContentContext(_dbContextOptions);
-            var contents = new List<string>();
-            contents.AddRange(new string[] { "one", "two", "three", "four", "five" });
-            var service = CreateService(context, null, contents);
+            var service = CreateService(context);
             
             //act
             var gameContents = await service.GetPartialContentForGame(_testGameId, new ContentFilterRequest());
             
             //assert
-            Assert.Equal(_testGameId.ToString(), gameContents.Id);
-            Assert.Equal(5, gameContents.Texts.Count);
-            Assert.Equal("one", gameContents.Texts[0]);
+            Assert.Equal(_testGameId, gameContents.Id);
+            Assert.Equal(3, gameContents.Texts.Count);
+            Assert.Equal(_contentOne, gameContents.Texts[0]);
         }
         
         [Fact]
@@ -106,9 +137,7 @@ namespace ContentApi.Tests.Services
         {
             //arrange
             await using var context = new ContentContext(_dbContextOptions);
-            var contents = new List<string>();
-            contents.AddRange(new string[] { "one", "two", "three", "four", "five" });
-            var service = CreateService(context, null, contents);
+            var service = CreateService(context);
             
             //act
             var gameContents = await service.GetPartialContentForGame(_testGameId, new ContentFilterRequest()
@@ -117,9 +146,9 @@ namespace ContentApi.Tests.Services
             });
             
             //assert
-            Assert.Equal(_testGameId.ToString(), gameContents.Id);
-            Assert.Equal(5, gameContents.Texts.Count);
-            Assert.Equal("one", gameContents.Texts[0]);
+            Assert.Equal(_testGameId, gameContents.Id);
+            Assert.Equal(3, gameContents.Texts.Count);
+            Assert.Equal(_contentOne, gameContents.Texts[0]);
         }
         
         [Fact]
@@ -127,9 +156,7 @@ namespace ContentApi.Tests.Services
         {
             //arrange
             await using var context = new ContentContext(_dbContextOptions);
-            var contents = new List<string>();
-            contents.AddRange(new string[] { "one", "two", "three", "four", "five" });
-            var service = CreateService(context, null, contents);
+            var service = CreateService(context);
             
             //act
             var gameContents = await service.GetPartialContentForGame(_testGameId, new ContentFilterRequest()
@@ -139,9 +166,9 @@ namespace ContentApi.Tests.Services
             });
             
             //assert
-            Assert.Equal(_testGameId.ToString(), gameContents.Id);
-            Assert.Equal(3, gameContents.Texts.Count);
-            Assert.Equal("three", gameContents.Texts[0]);
+            Assert.Equal(_testGameId, gameContents.Id);
+            Assert.Single(gameContents.Texts);
+            Assert.Equal(_contentLatest, gameContents.Texts[0]);
         }
         
         [Fact]
@@ -149,22 +176,20 @@ namespace ContentApi.Tests.Services
         {
             //arrange
             await using var context = new ContentContext(_dbContextOptions);
-            var contents = new List<string>();
-            contents.AddRange(new string[] { "one", "two", "three", "four", "five" });
-            var service = CreateService(context, null, contents);
+            var service = CreateService(context);
             
             //act
             var gameContents = await service.GetPartialContentForGame(_testGameId, new ContentFilterRequest()
             {
                 Direction = "f",
-                Start = 3,
+                Start = 1,
                 Count = 2
             });
             
             //assert
-            Assert.Equal(_testGameId.ToString(), gameContents.Id);
+            Assert.Equal(_testGameId, gameContents.Id);
             Assert.Equal(2, gameContents.Texts.Count);
-            Assert.Equal("four", gameContents.Texts[0]);
+            Assert.Equal(_contentTwo, gameContents.Texts[0]);
         }
         
         [Fact]
@@ -172,9 +197,7 @@ namespace ContentApi.Tests.Services
         {
             //arrange
             await using var context = new ContentContext(_dbContextOptions);
-            var contents = new List<string>();
-            contents.AddRange(new string[] { "one", "two", "three", "four", "five" });
-            var service = CreateService(context, null, contents);
+            var service = CreateService(context);
             
             //act
             var gameContents = await service.GetPartialContentForGame(_testGameId, new ContentFilterRequest()
@@ -184,9 +207,9 @@ namespace ContentApi.Tests.Services
             });
             
             //assert
-            Assert.Equal(_testGameId.ToString(), gameContents.Id);
+            Assert.Equal(_testGameId, gameContents.Id);
             Assert.Equal(2, gameContents.Texts.Count);
-            Assert.Equal("one", gameContents.Texts[0]);
+            Assert.Equal(_contentOne, gameContents.Texts[0]);
         }
         
         [Fact]
@@ -194,9 +217,7 @@ namespace ContentApi.Tests.Services
         {
             //arrange
             await using var context = new ContentContext(_dbContextOptions);
-            var contents = new List<string>();
-            contents.AddRange(new string[] { "one", "two", "three", "four", "five" });
-            var service = CreateService(context, null, contents);
+            var service = CreateService(context);
             
             //act
             var gameContents = await service.GetPartialContentForGame(_testGameId, new ContentFilterRequest()
@@ -205,9 +226,9 @@ namespace ContentApi.Tests.Services
             });
             
             //assert
-            Assert.Equal(_testGameId.ToString(), gameContents.Id);
-            Assert.Equal(5, gameContents.Texts.Count);
-            Assert.Equal("five", gameContents.Texts[0]);
+            Assert.Equal(_testGameId, gameContents.Id);
+            Assert.Equal(3, gameContents.Texts.Count);
+            Assert.Equal(_contentLatest, gameContents.Texts[0]);
         }
         
         [Fact]
@@ -215,21 +236,19 @@ namespace ContentApi.Tests.Services
         {
             //arrange
             await using var context = new ContentContext(_dbContextOptions);
-            var contents = new List<string>();
-            contents.AddRange(new string[] { "one", "two", "three", "four", "five" });
-            var service = CreateService(context, null, contents);
+            var service = CreateService(context);
             
             //act
             var gameContents = await service.GetPartialContentForGame(_testGameId, new ContentFilterRequest()
             {
                 Direction = "b",
-                Start = -2
+                Start = 1
             });
             
             //assert
-            Assert.Equal(_testGameId.ToString(), gameContents.Id);
-            Assert.Equal(4, gameContents.Texts.Count);
-            Assert.Equal("four", gameContents.Texts[0]);
+            Assert.Equal(_testGameId, gameContents.Id);
+            Assert.Equal(2, gameContents.Texts.Count);
+            Assert.Equal(_contentTwo, gameContents.Texts[0]);
         }
         
         [Fact]
@@ -237,9 +256,7 @@ namespace ContentApi.Tests.Services
         {
             //arrange
             await using var context = new ContentContext(_dbContextOptions);
-            var contents = new List<string>();
-            contents.AddRange(new string[] { "one", "two", "three", "four", "five" });
-            var service = CreateService(context, null, contents);
+            var service = CreateService(context);
             
             //act
             var gameContents = await service.GetPartialContentForGame(_testGameId, new ContentFilterRequest()
@@ -249,9 +266,9 @@ namespace ContentApi.Tests.Services
             });
             
             //assert
-            Assert.Equal(_testGameId.ToString(), gameContents.Id);
+            Assert.Equal(_testGameId, gameContents.Id);
             Assert.Equal(2, gameContents.Texts.Count);
-            Assert.Equal("five", gameContents.Texts[0]);
+            Assert.Equal(_contentLatest, gameContents.Texts[0]);
         }
         
         [Fact]
@@ -259,22 +276,20 @@ namespace ContentApi.Tests.Services
         {
             //arrange
             await using var context = new ContentContext(_dbContextOptions);
-            var contents = new List<string>();
-            contents.AddRange(new string[] { "one", "two", "three", "four", "five" });
-            var service = CreateService(context, null, contents);
+            var service = CreateService(context);
             
             //act
             var gameContents = await service.GetPartialContentForGame(_testGameId, new ContentFilterRequest()
             {
                 Direction = "b",
-                Start = -3,
+                Start = 1,
                 Count = 2
             });
             
             //assert
-            Assert.Equal(_testGameId.ToString(), gameContents.Id);
+            Assert.Equal(_testGameId, gameContents.Id);
             Assert.Equal(2, gameContents.Texts.Count);
-            Assert.Equal("three", gameContents.Texts[0]);
+            Assert.Equal(_contentOne, gameContents.Texts[1]);
         }
         
         [Fact]
@@ -282,9 +297,7 @@ namespace ContentApi.Tests.Services
         {
             //arrange
             await using var context = new ContentContext(_dbContextOptions);
-            var contents = new List<string>();
-            contents.AddRange(new string[] { "one", "two", "three", "four", "five" });
-            var service = CreateService(context, null, contents);
+            var service = CreateService(context);
 
             //act
             //assert

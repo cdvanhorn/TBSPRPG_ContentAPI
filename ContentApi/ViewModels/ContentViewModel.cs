@@ -1,16 +1,24 @@
+using System;
 using System.Collections.Generic;
-
+using System.Linq;
+using ContentApi.Entities;
 using TbspRpgLib.Aggregates;
 
 namespace ContentApi.ViewModels {
     public class ContentViewModel {
-        public ContentViewModel(ContentAggregate agg) {
-            Id = agg.Id;
-            Texts = agg.Text;
-            Index = agg.StreamPosition;
+        public ContentViewModel(IEnumerable<Content> contents) {
+            Texts = new List<string>();
+            Index = 0;
+            foreach (var content in contents)
+            {
+                Id = content.Id;
+                if(content.Position > Index)
+                    Index = content.Position;
+                Texts.Add(content.Text);
+            }
         }
 
-        public string Id { get; set; }
+        public Guid Id { get; set; }
 
         public List<string> Texts { get; set; }
 

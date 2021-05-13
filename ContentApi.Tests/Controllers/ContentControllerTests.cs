@@ -31,9 +31,7 @@ namespace ContentApi.Tests.Controllers
         private ContentController CreateController(ContentContext context, ICollection<Event> events, List<string> contents)
         {
             var repository = new ContentRepository(context);
-            var service = new ContentService(
-                repository,
-                MockAggregateService(events, contents));
+            var service = new ContentService(repository);
             return new ContentController(service);
         }
 
