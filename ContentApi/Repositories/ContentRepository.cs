@@ -33,12 +33,26 @@ namespace ContentApi.Repositories {
 
         public Task<List<Content>> GetContentForGame(Guid gameId, int? offset = null, int? count = null)
         {
-            throw new NotImplementedException();
+            var query = _context.Contents.AsQueryable()
+                .Where(c => c.GameId == gameId)
+                .OrderBy(c => c.Position);
+            if (offset != null)
+                query = (IOrderedQueryable<Content>) query.Skip(offset.Value);
+            if (count != null)
+                query = (IOrderedQueryable<Content>) query.Take(count.Value);
+            return query.ToListAsync();
         }
 
         public Task<List<Content>> GetContentForGameReverse(Guid gameId, int? offset = null, int? count = null)
         {
-            throw new NotImplementedException();
+            var query = _context.Contents.AsQueryable()
+                .Where(c => c.GameId == gameId)
+                .OrderByDescending(c => c.Position);
+            if (offset != null)
+                query = (IOrderedQueryable<Content>) query.Skip(offset.Value);
+            if (count != null)
+                query = (IOrderedQueryable<Content>) query.Take(count.Value);
+            return query.ToListAsync();
         }
 
         public void AddContent(Content content)

@@ -210,7 +210,6 @@ namespace ContentApi.Tests.Repositories
             
             //assert
             Assert.Single(contents);
-            Assert.Equal(_testContentId, contents[0].Id);
             Assert.Equal((ulong)0, contents[0].Position);
         }
         
@@ -242,7 +241,6 @@ namespace ContentApi.Tests.Repositories
             var repository = new ContentRepository(context);
             var content = new Content()
             {
-                Id = Guid.NewGuid(),
                 GameId = _testGameId,
                 Position = 43,
                 Text = "add content"
@@ -253,44 +251,8 @@ namespace ContentApi.Tests.Repositories
             repository.SaveChanges();
             
             //assert
-            Assert.Equal(4, context.Contents.Count());
+            Assert.Equal(5, context.Contents.Count());
             Assert.NotNull(context.Contents.FirstOrDefault(c => c.Id == content.Id));
-        }
-        
-        [Fact]
-        public async void AddContent_NoGame_ContentAdded()
-        {
-            //arrange
-            await using var context = new ContentContext(_dbContextOptions);
-            var repository = new ContentRepository(context);
-            var content = new Content()
-            {
-                Id = Guid.NewGuid(),
-                Position = 43,
-                Text = "add content"
-            };
-            
-            //act, exception thrown don't know it
-            repository.AddContent(content);
-            repository.SaveChanges();
-        }
-        
-        [Fact]
-        public async void AddContent_NoPosition_ContentAdded()
-        {
-            //arrange
-            await using var context = new ContentContext(_dbContextOptions);
-            var repository = new ContentRepository(context);
-            var content = new Content()
-            {
-                Id = Guid.NewGuid(),
-                Position = 43,
-                Text = "add content"
-            };
-            
-            //act, exception thrown don't know it
-            repository.AddContent(content);
-            repository.SaveChanges();
         }
 
         #endregion
