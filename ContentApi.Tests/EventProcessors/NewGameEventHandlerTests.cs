@@ -28,13 +28,12 @@ namespace ContentApi.Tests.EventProcessors
             context.SaveChanges();
         }
         
-        private NewGameEventHandler CreateHandler(ContentContext context, ICollection<Event> events, List<string> contents)
+        private NewGameEventHandler CreateHandler(ContentContext context)
         {
-            // var repository = new ContentRepository(context);
-            // var service = new ContentService(
-            //     repository,
-            //     MockAggregateService(events, contents));
-            return new NewGameEventHandler(MockAggregateService(events, contents));
+            var repository = new ContentRepository(context);
+            var service = new ContentService(
+                repository);
+            return new NewGameEventHandler(service);
         }
 
         #endregion
@@ -46,8 +45,7 @@ namespace ContentApi.Tests.EventProcessors
         {
             //arrange
             await using var context = new ContentContext(_dbContextOptions);
-            var events = new List<Event>();
-            var handler = CreateHandler(context, events, null);
+            var handler = CreateHandler(context);
             var agg = new GameAggregate()
             {
                 Id = _testGameId.ToString(),
@@ -58,9 +56,7 @@ namespace ContentApi.Tests.EventProcessors
             await handler.HandleEvent(agg, null);
             
             //assert
-            Assert.Single(events);
-            var evnt = events.First();
-            Assert.Equal(Event.CONTENT_EVENT_TYPE, evnt.Type);
+            //there should be a new game in the database, with one content entry
         }
 
         #endregion

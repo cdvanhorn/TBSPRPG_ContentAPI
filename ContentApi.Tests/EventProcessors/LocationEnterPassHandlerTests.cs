@@ -28,13 +28,12 @@ namespace ContentApi.Tests.EventProcessors
             context.SaveChanges();
         }
         
-        private LocationEnterPassHandler CreateHandler(ContentContext context, ICollection<Event> events, List<string> contents)
+        private LocationEnterPassHandler CreateHandler(ContentContext context)
         {
-            // var repository = new ContentRepository(context);
-            // var service = new ContentService(
-            //     repository,
-            //     MockAggregateService(events, contents));
-            return new LocationEnterPassHandler(MockAggregateService(events, contents));
+            var repository = new ContentRepository(context);
+            var service = new ContentService(
+                repository);
+            return new LocationEnterPassHandler(service);
         }
 
         #endregion
@@ -46,8 +45,7 @@ namespace ContentApi.Tests.EventProcessors
         {
             //arrange
             await using var context = new ContentContext(_dbContextOptions);
-            var events = new List<Event>();
-            var handler = CreateHandler(context, events, null);
+            var handler = CreateHandler(context);
             var agg = new GameAggregate()
             {
                 Id = _testGameId.ToString(),
@@ -58,9 +56,26 @@ namespace ContentApi.Tests.EventProcessors
             await handler.HandleEvent(agg, null);
             
             //assert
-            Assert.Single(events);
-            var evnt = events.First();
-            Assert.Equal(Event.CONTENT_EVENT_TYPE, evnt.Type);
+            //there should be a game in the database with two events
+        }
+        
+        [Fact]
+        public async void HandleEvent_NoGame_HandlerFail()
+        {
+            //arrange
+            await using var context = new ContentContext(_dbContextOptions);
+            var handler = CreateHandler(context);
+            var agg = new GameAggregate()
+            {
+                Id = _testGameId.ToString(),
+                AdventureId = Guid.NewGuid().ToString()
+            };
+            
+            //act
+            await handler.HandleEvent(agg, null);
+            
+            //assert
+            //there should be no games in the database and no content
         }
 
         #endregion
