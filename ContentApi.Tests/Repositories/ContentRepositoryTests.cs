@@ -61,41 +61,7 @@ namespace ContentApi.Tests.Repositories
         }
 
         #endregion
-
-        #region GetLatestContentForGame
-
-        [Fact]
-        public async void GetLatestContentForGame_Valid_ReturnsLatest()
-        {
-            //arrange
-            await using var context = new ContentContext(_dbContextOptions);
-            var repository = new ContentRepository(context);
-            
-            //act
-            var content = await repository.GetLatestContentForGame(_testGameId);
-            
-            //assert
-            Assert.NotNull(content);
-            Assert.Equal(_testContentId, content.Id);
-            Assert.Equal((ulong)42, content.Position);
-        }
         
-        [Fact]
-        public async void GetLatestContentForGame_InValidId_ReturnsNone()
-        {
-            //arrange
-            await using var context = new ContentContext(_dbContextOptions);
-            var repository = new ContentRepository(context);
-            
-            //act
-            var content = await repository.GetLatestContentForGame(Guid.NewGuid());
-            
-            //assert
-            Assert.Null(content);
-        }
-
-        #endregion
-
         #region GetContentForGame
 
         [Fact]

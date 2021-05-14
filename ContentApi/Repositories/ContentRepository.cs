@@ -9,7 +9,6 @@ using TbspRpgLib.Repositories;
 namespace ContentApi.Repositories {
     public interface IContentRepository : IServiceTrackingRepository
     {
-        Task<Content> GetLatestContentForGame(Guid gameId);
         Task<List<Content>> GetContentForGame(Guid gameId, int? offset = null, int? count = null);
         Task<List<Content>> GetContentForGameReverse(Guid gameId, int? offset = null, int? count = null);
         void AddContent(Content content);
@@ -21,14 +20,6 @@ namespace ContentApi.Repositories {
 
         public ContentRepository(ContentContext context) : base(context) {
             _context = context;
-        }
-
-        public Task<Content> GetLatestContentForGame(Guid gameId)
-        {
-            return _context.Contents.AsQueryable()
-                .Where(c => c.GameId == gameId)
-                .OrderByDescending(c => c.Position)
-                .FirstOrDefaultAsync();
         }
 
         public Task<List<Content>> GetContentForGame(Guid gameId, int? offset = null, int? count = null)
