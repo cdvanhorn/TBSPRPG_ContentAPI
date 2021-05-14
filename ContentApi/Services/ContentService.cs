@@ -7,6 +7,7 @@ using ContentApi.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ContentApi.Entities;
 
 namespace ContentApi.Services {
     public interface IContentService : IServiceTrackingService {
@@ -22,32 +23,42 @@ namespace ContentApi.Services {
             _repository = repository;
         }
 
-        public Task<ContentViewModel> GetAllContentForGame(Guid gameId)
+        public async Task<ContentViewModel> GetAllContentForGame(Guid gameId)
         {
-            return GetAllContentForGame(gameId.ToString());
+            var contents = await _repository.GetContentForGame(gameId);
+            return new ContentViewModel(contents);
         }
 
-        private async Task<ContentViewModel> GetAllContentForGame(string gameId)
+        public async Task<ContentViewModel> GetLatestForGame(Guid gameId)
         {
-            throw new NotImplementedException();
+            var contents = await _repository.GetContentForGameReverse(gameId, null, 1);
+            return new ContentViewModel(contents);
         }
 
-        public Task<ContentViewModel> GetLatestForGame(Guid gameId)
+        public async Task<ContentViewModel> GetPartialContentForGame(Guid gameId, ContentFilterRequest filterRequest)
         {
-            return GetLatestForGame(gameId.ToString());
-        }
+            List<Content> contents = null;
+            if (string.IsNullOrEmpty(filterRequest.Direction) || filterRequest.IsForward())
+            {
+                contents = await _repository.GetContentForGame(
+                    gameId,
+                    (int?) filterRequest.Start,
+                    (int?) filterRequest.Count);
+            } 
+            else if (filterRequest.IsBackward())
+            {
+                contents = await _repository.GetContentForGameReverse(
+                    gameId,
+                    (int?) filterRequest.Start,
+                    (int?) filterRequest.Count);
+            }
+            else
+            {
+                //we can't parse the direction
+                throw new ArgumentException($"invalid direction argument {filterRequest.Direction}");
+            }
 
-        private async Task<ContentViewModel> GetLatestForGame(string gameId) {
-            throw new NotImplementedException();
-        }
-
-        public Task<ContentViewModel> GetPartialContentForGame(Guid gameId, ContentFilterRequest filterRequest)
-        {
-            return GetPartialContentForGame(gameId.ToString(), filterRequest);
-        }
-
-        private async Task<ContentViewModel> GetPartialContentForGame(string gameId, ContentFilterRequest filterRequest) {
-            throw new NotImplementedException();
+            return new ContentViewModel(contents);
         }
     }
 }

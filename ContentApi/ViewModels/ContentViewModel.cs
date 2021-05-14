@@ -11,7 +11,7 @@ namespace ContentApi.ViewModels {
             Index = 0;
             foreach (var content in contents)
             {
-                Id = content.Id;
+                Id = content.GameId;
                 if(content.Position > Index)
                     Index = content.Position;
                 Texts.Add(content.Text);
