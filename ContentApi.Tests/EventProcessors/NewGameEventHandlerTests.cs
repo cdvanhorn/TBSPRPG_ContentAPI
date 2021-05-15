@@ -56,7 +56,8 @@ namespace ContentApi.Tests.EventProcessors
             await handler.HandleEvent(agg, null);
             
             //assert
-            //there should be a new game in the database, with one content entry
+            //there should be a new game in the database
+            Assert.NotNull(context.Games.FirstOrDefault(g => g.Id == _testGameId));
         }
 
         #endregion

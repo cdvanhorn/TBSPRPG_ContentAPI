@@ -56,7 +56,7 @@ namespace ContentApi.Tests.EventProcessors
             await handler.HandleEvent(agg, null);
             
             //assert
-            //there should be a game in the database with two events
+            Assert.Single(context.Contents.AsQueryable().Where(c => c.GameId == _testGameId));
         }
         
         [Fact]
@@ -72,10 +72,10 @@ namespace ContentApi.Tests.EventProcessors
             };
             
             //act
-            await handler.HandleEvent(agg, null);
-            
+            Task Act() => handler.HandleEvent(agg, null);
+
             //assert
-            //there should be no games in the database and no content
+            await Assert.ThrowsAsync<Exception>(Act);
         }
 
         #endregion

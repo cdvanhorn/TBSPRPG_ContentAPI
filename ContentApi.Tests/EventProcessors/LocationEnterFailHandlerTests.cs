@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using ContentApi.EventProcessors;
 using ContentApi.Repositories;
 using ContentApi.Services;
@@ -41,7 +42,7 @@ namespace ContentApi.Tests.EventProcessors
         #region HandleEvent
 
         [Fact]
-        public async void HandleEvent_ContentEventCreated()
+        public async void HandleEvent_ContentCreated()
         {
             //arrange
             await using var context = new ContentContext(_dbContextOptions);
@@ -56,7 +57,27 @@ namespace ContentApi.Tests.EventProcessors
             await handler.HandleEvent(agg, null);
             
             //assert
-            //there should be a game with two content items
+            //there should be a game with a content item
+            Assert.Single(context.Contents.AsQueryable().Where(c => c.GameId == _testGameId));
+        }
+        
+        [Fact]
+        public async void HandleEvent_NoGame_ExceptionThrown()
+        {
+            //arrange
+            await using var context = new ContentContext(_dbContextOptions);
+            var handler = CreateHandler(context);
+            var agg = new GameAggregate()
+            {
+                Id = _testGameId.ToString(),
+                AdventureId = Guid.NewGuid().ToString()
+            };
+            
+            //act
+            Task Act() => handler.HandleEvent(agg, null);
+
+            //assert
+            await Assert.ThrowsAsync<Exception>(Act);
         }
 
         #endregion
