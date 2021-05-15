@@ -17,10 +17,9 @@ namespace ContentApi.Tests.EventProcessors
     {
         #region Setup
 
-        private Guid _testContentId;
+        private readonly Guid _testContentId = Guid.NewGuid();
         public LocationEnterPassHandlerTests() : base("LocationEnterPassHandlerTests")
         {
-            _testContentId = Guid.NewGuid();
             Seed();
         }
         
