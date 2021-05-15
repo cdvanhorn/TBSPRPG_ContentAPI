@@ -18,12 +18,9 @@ namespace ContentApi.EventProcessors {
         }
 
         protected override async Task HandleEvent(Game game, Event evnt) {
-            //need to create a new event stream that will be the content for this game
-            //will eventually call the adventure api to get the opening credits
-            //for now create a new content event and send it
-            // var eventId = gameAggregate.Id;
-            // var eventText = $"New game started with id {gameAggregate.Id} of adventure {gameAggregate.AdventureId}";
-            //await SendContentEvent(eventId, eventText, true);
+            //add the game to the database, if it doesn't already exist
+            //add appropriate content to the database as well
+            await _gameService.AddGame(game);
         }
     }
 }
