@@ -33,7 +33,9 @@ namespace ContentApi.Tests.EventProcessors
             var repository = new ContentRepository(context);
             var service = new ContentService(
                 repository);
-            return new NewGameEventHandler(service);
+            var gameRepository = new GameRepository(context);
+            var gameService = new GameService(gameRepository);
+            return new NewGameEventHandler(service, gameService);
         }
 
         #endregion

@@ -1,4 +1,7 @@
 using System.Threading.Tasks;
+using ContentApi.Adapters;
+using ContentApi.Entities;
+using ContentApi.Services;
 using TbspRpgLib.Aggregates;
 using TbspRpgLib.Events;
 using TbspRpgLib.Events.Content;
@@ -8,27 +11,26 @@ namespace ContentApi.EventProcessors {
         Task HandleEvent(GameAggregate gameAggregate, Event evnt);
     }
 
-    public class EventHandler {
-        protected IAggregateService _aggregateService;
+    public abstract class EventHandler
+    {
+        protected IContentService _contentService;
+        protected IGameService _gameService;
+        private IGameAggregateAdapter _gameAggregateAdapter;
 
-        public EventHandler(IAggregateService aggregateService) {
-            _aggregateService = aggregateService;
+        public EventHandler(IContentService contentService, IGameService gameService)
+        {
+            _contentService = contentService;
+            _gameService = gameService;
+            _gameAggregateAdapter = new GameAggregateAdapter();
         }
 
-        protected async Task SendContentEvent(string eventId, string text, bool streamNew) {
-            ContentContent eventContent = new ContentContent();
-            eventContent.Id = eventId;
-            eventContent.Text = text;
-            var contentEvent = new ContentEvent(eventContent);
-            await _aggregateService.AppendToAggregate(
-                    AggregateService.CONTENT_AGGREGATE_TYPE,
-                    contentEvent,
-                    streamNew);
-
-            // if(streamNew)
-            //     await _eventService.SendEvent(contentEvent, true);
-            // else
-            //     await _eventService.SendEvent(contentEvent, false);
+        public Task HandleEvent(GameAggregate gameAggregate, Event evnt)
+        {
+            return HandleEvent(
+                _gameAggregateAdapter.ToEntity(gameAggregate),
+                evnt);
         }
+
+        protected abstract Task HandleEvent(Game game, Event evnt);
     }
 }

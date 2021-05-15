@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using ContentApi.EventProcessors;
 using ContentApi.Repositories;
 using ContentApi.Services;
@@ -33,7 +34,9 @@ namespace ContentApi.Tests.EventProcessors
             var repository = new ContentRepository(context);
             var service = new ContentService(
                 repository);
-            return new LocationEnterPassHandler(service);
+            var gameRepository = new GameRepository(context);
+            var gameService = new GameService(gameRepository);
+            return new LocationEnterPassHandler(service, gameService);
         }
 
         #endregion
