@@ -14,6 +14,7 @@ namespace ContentApi.Services {
         Task<ContentViewModel> GetAllContentForGame(Guid gameId);
         Task<ContentViewModel> GetLatestForGame(Guid gameId);
         Task<ContentViewModel> GetPartialContentForGame(Guid gameId, ContentFilterRequest filterRequest);
+        Task AddContent(Content content);
     }
 
     public class ContentService : ServiceTrackingService, IContentService {
@@ -59,6 +60,16 @@ namespace ContentApi.Services {
             }
 
             return new ContentViewModel(contents);
+        }
+
+        public async Task AddContent(Content content)
+        {
+            //check if we already have this content determined by game id and position
+            var dbContent = await _repository.GetContentForGameWithPosition(content.GameId, content.Position);
+            if (dbContent == null)
+            {
+                _repository.AddContent(content);
+            }
         }
     }
 }

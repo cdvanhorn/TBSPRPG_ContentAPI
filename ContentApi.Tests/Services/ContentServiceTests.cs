@@ -311,5 +311,55 @@ namespace ContentApi.Tests.Services
         }
         
         #endregion
+
+        #region AddContent
+
+        [Fact]
+        public async void AddContent_NotExists_ContentAdded()
+        {
+            //arrange
+            await using var context = new ContentContext(_dbContextOptions);
+            var service = CreateService(context);
+            var content = new Content()
+            {
+                Id = Guid.NewGuid(),
+                GameId = _testGameId,
+                Position = 43,
+                Text = "added content"
+            };
+            
+            //act
+            await service.AddContent(content);
+            
+            //assert
+            context.SaveChanges();
+            Assert.Equal(4, context.Contents.Count(c => c.GameId == _testGameId));
+            Assert.NotNull(context.Contents.FirstOrDefault(c => c.Id == content.Id));
+        }
+        
+        [Fact]
+        public async void AddContent_Exists_ContentNotAdded()
+        {
+            //arrange
+            await using var context = new ContentContext(_dbContextOptions);
+            var service = CreateService(context);
+            var content = new Content()
+            {
+                Id = Guid.NewGuid(),
+                GameId = _testGameId,
+                Position = 42,
+                Text = "added content"
+            };
+            
+            //act
+            await service.AddContent(content);
+            
+            //assert
+            context.SaveChanges();
+            Assert.Equal(3, context.Contents.Count(c => c.GameId == _testGameId));
+            Assert.Null(context.Contents.FirstOrDefault(c => c.Id == content.Id));
+        }
+
+        #endregion
     }
 }
