@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ContentApi.Entities;
 using ContentApi.EventProcessors;
 using ContentApi.Repositories;
 using ContentApi.Services;
 using TbspRpgLib.Aggregates;
 using TbspRpgLib.Events;
+using TbspRpgLib.Events.Location;
 using Xunit;
 
 namespace ContentApi.Tests.EventProcessors
@@ -15,8 +17,10 @@ namespace ContentApi.Tests.EventProcessors
     {
         #region Setup
 
+        private Guid _testContentId;
         public LocationEnterPassHandlerTests() : base("LocationEnterPassHandlerTests")
         {
+            _testContentId = Guid.NewGuid();
             Seed();
         }
         
@@ -25,6 +29,22 @@ namespace ContentApi.Tests.EventProcessors
             using var context = new ContentContext(_dbContextOptions);
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
+            
+            var game = new Game()
+            {
+                Id = _testGameId
+            };
+
+            var content = new Content()
+            {
+                Id = _testContentId,
+                GameId = _testGameId,
+                Position = 42,
+                Text = "bananas"
+            };
+
+            context.Games.Add(game);
+            context.Contents.Add(content);
 
             context.SaveChanges();
         }
@@ -44,7 +64,7 @@ namespace ContentApi.Tests.EventProcessors
         #region HandleEvent
 
         [Fact]
-        public async void HandleEvent_ContentEventCreated()
+        public async void HandleEvent_NewContent_ContentAdded()
         {
             //arrange
             await using var context = new ContentContext(_dbContextOptions);
@@ -54,11 +74,44 @@ namespace ContentApi.Tests.EventProcessors
                 Id = _testGameId.ToString(),
                 AdventureId = Guid.NewGuid().ToString()
             };
+
+            var evnt = new LocationEnterPassEvent()
+            {
+                EventId = Guid.NewGuid(),
+                StreamPosition = 43
+            };
             
             //act
-            await handler.HandleEvent(agg, null);
+            await handler.HandleEvent(agg, evnt);
             
             //assert
+            context.SaveChanges();
+            Assert.Equal(2, context.Contents.AsQueryable().Count(c => c.GameId == _testGameId));
+        }
+        
+        [Fact]
+        public async void HandleEvent_ExistingContent_ContentNotAdded()
+        {
+            //arrange
+            await using var context = new ContentContext(_dbContextOptions);
+            var handler = CreateHandler(context);
+            var agg = new GameAggregate()
+            {
+                Id = _testGameId.ToString(),
+                AdventureId = Guid.NewGuid().ToString()
+            };
+
+            var evnt = new LocationEnterPassEvent()
+            {
+                EventId = Guid.NewGuid(),
+                StreamPosition = 42
+            };
+            
+            //act
+            await handler.HandleEvent(agg, evnt);
+            
+            //assert
+            context.SaveChanges();
             Assert.Single(context.Contents.AsQueryable().Where(c => c.GameId == _testGameId));
         }
         
@@ -70,7 +123,7 @@ namespace ContentApi.Tests.EventProcessors
             var handler = CreateHandler(context);
             var agg = new GameAggregate()
             {
-                Id = _testGameId.ToString(),
+                Id = Guid.NewGuid().ToString(),
                 AdventureId = Guid.NewGuid().ToString()
             };
             
