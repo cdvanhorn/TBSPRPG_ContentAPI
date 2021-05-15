@@ -222,5 +222,53 @@ namespace ContentApi.Tests.Repositories
         }
 
         #endregion
+
+        #region GetContentForGameWithPosition
+
+        [Fact]
+        public async void GetContentForGameWithPosition_Exists_ReturnsOne()
+        {
+            //arrange
+            await using var context = new ContentContext(_dbContextOptions);
+            var repository = new ContentRepository(context);
+            
+            //act
+            var content = await repository.GetContentForGameWithPosition(_testGameId, 42);
+            
+            //assert
+            Assert.NotNull(content);
+            Assert.Equal(_testGameId, content.GameId);
+            Assert.Equal((ulong)42, content.Position);
+        }
+        
+        [Fact]
+        public async void GetContentForGameWithPosition_BadPosition_ReturnsNone()
+        {
+            //arrange
+            await using var context = new ContentContext(_dbContextOptions);
+            var repository = new ContentRepository(context);
+            
+            //act
+            var content = await repository.GetContentForGameWithPosition(_testGameId, 5030);
+            
+            //assert
+            Assert.Null(content);
+        }
+        
+        [Fact]
+        public async void GetContentForGameWithPosition_BadId_ReturnsNone()
+        {
+            //arrange
+            await using var context = new ContentContext(_dbContextOptions);
+            var repository = new ContentRepository(context);
+            
+            //act
+            var content = await repository.GetContentForGameWithPosition(Guid.NewGuid(), 42);
+            
+            //assert
+            Assert.Null(content);
+        }
+
+        #endregion
     }
 }

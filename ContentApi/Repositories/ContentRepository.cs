@@ -13,6 +13,7 @@ namespace ContentApi.Repositories {
         Task<List<Content>> GetContentForGameReverse(Guid gameId, int? offset = null, int? count = null);
         void AddContent(Content content);
         void SaveChanges();
+        Task<Content> GetContentForGameWithPosition(Guid gameId, ulong position);
     }
 
     public class ContentRepository : ServiceTrackingRepository, IContentRepository {
@@ -54,6 +55,12 @@ namespace ContentApi.Repositories {
         public void SaveChanges()
         {
             _context.SaveChanges();
+        }
+
+        public Task<Content> GetContentForGameWithPosition(Guid gameId, ulong position)
+        {
+            return _context.Contents.AsQueryable()
+                .FirstOrDefaultAsync(c => c.GameId == gameId && c.Position == position);
         }
     }
 }
