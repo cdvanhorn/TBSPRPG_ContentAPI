@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ContentApi.Adapters;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -44,7 +45,9 @@ namespace ContentApi
             );
 
             services.AddScoped<IContentRepository, ContentRepository>();
+            services.AddScoped<IGameRepository, GameRepository>();
             services.AddScoped<IContentService, ContentService>();
+            services.AddScoped<IGameService, GameService>();
             services.AddScoped<INewGameEventHandler, NewGameEventHandler>();
             services.AddScoped<ILocationEnterPassHandler, LocationEnterPassHandler>();
             services.AddScoped<ILocationEnterFailHandler, LocationEnterFailHandler>();

@@ -5,133 +5,71 @@ using ContentApi.Repositories;
 using ContentApi.ViewModels;
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using ContentApi.Entities;
 
 namespace ContentApi.Services {
     public interface IContentService : IServiceTrackingService {
         Task<ContentViewModel> GetAllContentForGame(Guid gameId);
         Task<ContentViewModel> GetLatestForGame(Guid gameId);
         Task<ContentViewModel> GetPartialContentForGame(Guid gameId, ContentFilterRequest filterRequest);
+        Task AddContent(Content content);
     }
 
     public class ContentService : ServiceTrackingService, IContentService {
         private readonly IContentRepository _repository;
-        private readonly IAggregateService _aggregateService;
 
-        public ContentService(IContentRepository repository, IAggregateService aggregateService) : base(repository) {
+        public ContentService(IContentRepository repository) : base(repository) {
             _repository = repository;
-            _aggregateService = aggregateService;
         }
 
-        public Task<ContentViewModel> GetAllContentForGame(Guid gameId)
+        public async Task<ContentViewModel> GetAllContentForGame(Guid gameId)
         {
-            return GetAllContentForGame(gameId.ToString());
+            var contents = await _repository.GetContentForGame(gameId);
+            return new ContentViewModel(contents);
         }
 
-        private async Task<ContentViewModel> GetAllContentForGame(string gameId) {
-            //need to fix this hard coding
-            var agg = await _aggregateService.BuildAggregate($"content_{gameId}","ContentAggregate");
-            return new ContentViewModel((ContentAggregate)agg);
-        }
-
-        public Task<ContentViewModel> GetLatestForGame(Guid gameId)
+        public async Task<ContentViewModel> GetLatestForGame(Guid gameId)
         {
-            return GetLatestForGame(gameId.ToString());
+            var contents = await _repository.GetContentForGameReverse(gameId, null, 1);
+            return new ContentViewModel(contents);
         }
 
-        private async Task<ContentViewModel> GetLatestForGame(string gameId) {
-            var agg = await _aggregateService.BuildPartialAggregateLatest($"content_{gameId}", "ContentAggregate");
-            return new ContentViewModel((ContentAggregate)agg);
-        }
-
-        public Task<ContentViewModel> GetPartialContentForGame(Guid gameId, ContentFilterRequest filterRequest)
+        public async Task<ContentViewModel> GetPartialContentForGame(Guid gameId, ContentFilterRequest filterRequest)
         {
-            return GetPartialContentForGame(gameId.ToString(), filterRequest);
-        }
-
-        private async Task<ContentViewModel> GetPartialContentForGame(string gameId, ContentFilterRequest filterRequest) {
-            Aggregate agg = null;
-
-            if(filterRequest.Direction == null || (filterRequest.Direction != null && filterRequest.IsForward())) {
-                //direction specified and it's forward, or un specified so forward by default
-                if(filterRequest.Start == null && filterRequest.Count == null) {
-                    //no start specified so start at beginning and read everything
-                    agg = await _aggregateService.BuildAggregate(
-                        gameId,
-                        "ContentAggregate"
-                    );
-                } else if(filterRequest.Start != null && filterRequest.Count == null) {
-                    //there is a start and we're reading to the end
-                    agg = await _aggregateService.BuildPartialAggregate(
-                        gameId,
-                        "ContentAggregate",
-                        (ulong)filterRequest.Start.GetValueOrDefault()
-                    );
-                } else if(filterRequest.Start == null && filterRequest.Count != null) {
-                    //we're starting at the beginning and reading given count
-                    agg = await _aggregateService.BuildPartialAggregate(
-                        gameId,
-                        "ContentAggregate",
-                        0,
-                        filterRequest.Count.GetValueOrDefault()
-                    );
-                } else {
-                    // they're both not null
-                    //we have a start point and a count
-                    agg = await _aggregateService.BuildPartialAggregate(
-                        gameId,
-                        "ContentAggregate",
-                        (ulong)filterRequest.Start.GetValueOrDefault(),
-                        filterRequest.Count.GetValueOrDefault()
-                    );
-                }
-            } else if(filterRequest.Direction != null && filterRequest.IsBackward()) {
-                //direction specified and it's backward
-                if(filterRequest.Start == null && filterRequest.Count == null) {
-                    //no start specified so start at end and read everything
-                    agg = await _aggregateService.BuildAggregateReverse(
-                        gameId,
-                        "ContentAggregate"
-                    );
-                } else if(filterRequest.Start != null && filterRequest.Count == null) {
-                    //there is a start and we're reading to the beginning
-                    agg = await _aggregateService.BuildPartialAggregateReverse(
-                        gameId,
-                        "ContentAggregate",
-                        filterRequest.Start.GetValueOrDefault()
-                    );
-                } else if(filterRequest.Start == null && filterRequest.Count != null) {
-                    //we're starting at the end and reading given count, how do I get the last position
-                    agg = await _aggregateService.BuildPartialAggregateReverse(
-                        gameId,
-                        "ContentAggregate",
-                        -1,
-                        filterRequest.Count.GetValueOrDefault()
-                    );
-                } else {
-                    // they're both not null
-                    //we have a start point and a count
-                    agg = await _aggregateService.BuildPartialAggregateReverse(
-                        gameId,
-                        "ContentAggregate",
-                        filterRequest.Start.GetValueOrDefault(),
-                        filterRequest.Count.GetValueOrDefault()
-                    );
-                }
-            } else if(filterRequest.Direction != null)
+            List<Content> contents = null;
+            if (string.IsNullOrEmpty(filterRequest.Direction) || filterRequest.IsForward())
             {
-                throw new ArgumentException($"invalid direction {filterRequest.Direction}");
-            } else {
-                //we shouldn't be here, log error, return a bad request
-                throw new ArgumentException("¯/_(ツ)_/¯");
+                contents = await _repository.GetContentForGame(
+                    gameId,
+                    (int?) filterRequest.Start,
+                    (int?) filterRequest.Count);
+            } 
+            else if (filterRequest.IsBackward())
+            {
+                contents = await _repository.GetContentForGameReverse(
+                    gameId,
+                    (int?) filterRequest.Start,
+                    (int?) filterRequest.Count);
+            }
+            else
+            {
+                //we can't parse the direction
+                throw new ArgumentException($"invalid direction argument {filterRequest.Direction}");
             }
 
-            if(agg == null) {
-                //log error, return a bad request, this shouldn't happen, even if there are no content events
-                throw new Exception("invalid response from aggregate service");
-            }
+            return new ContentViewModel(contents);
+        }
 
-            return new ContentViewModel((ContentAggregate)agg);
+        public async Task AddContent(Content content)
+        {
+            //check if we already have this content determined by game id and position
+            var dbContent = await _repository.GetContentForGameWithPosition(content.GameId, content.Position);
+            if (dbContent == null)
+            {
+                _repository.AddContent(content);
+            }
         }
     }
 }

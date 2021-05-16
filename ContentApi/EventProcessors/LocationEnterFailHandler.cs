@@ -1,23 +1,34 @@
+using System;
 using TbspRpgLib.Events;
 using TbspRpgLib.Aggregates;
 
 using System.Threading.Tasks;
+using ContentApi.Entities;
+using ContentApi.Services;
 
 namespace ContentApi.EventProcessors {
     public interface ILocationEnterFailHandler : IEventHandler {
 
     }
     public class LocationEnterFailHandler : EventHandler, ILocationEnterFailHandler {
-        public LocationEnterFailHandler(IAggregateService aggregateService) : base(aggregateService) {
+        public LocationEnterFailHandler(IContentService contentService, IGameService gameService) :
+            base(contentService, gameService) {
         }
 
-        public async Task HandleEvent(GameAggregate gameAggregate, Event evnt) {
-            //need to create a new event stream that will be the content for this game
-            //will eventually call the adventure api to get the opening credits
-            //for now create a new content event and send it
-            var eventId = gameAggregate.Id;
-            var eventText = $"{gameAggregate.Id} of adventure {gameAggregate.AdventureId} failed to enter location";
-            await SendContentEvent(eventId, eventText, false);
+        protected override async Task HandleEvent(Game game, Event evnt) {
+            var dbGame = await _gameService.GetGameById(game.Id);
+            if (dbGame == null)
+            {
+                throw new Exception("can't process event before game in database");
+            }
+            //add some content to the database
+            var content = new Content()
+            {
+                GameId = game.Id,
+                Position = evnt.StreamPosition,
+                Text = $"{game.Id} unsuccessfully entered a location"
+            };
+            await _contentService.AddContent(content);
         }
     }
 }

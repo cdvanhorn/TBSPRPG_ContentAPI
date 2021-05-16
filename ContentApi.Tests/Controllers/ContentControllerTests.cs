@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ContentApi.Controllers;
+using ContentApi.Entities;
 using ContentApi.Repositories;
 using ContentApi.Services;
 using ContentApi.ViewModels;
@@ -14,8 +16,13 @@ namespace ContentApi.Tests.Controllers
     {
         #region Setup
 
+        private readonly Guid _testContentId;
+        private readonly string _contentOne = "first content";
+        private readonly string _contentTwo = "second content";
+        private readonly string _contentLatest = "latest content";
         public ContentControllerTests() : base("ContentControllerTests")
         {
+            _testContentId = Guid.NewGuid();
             Seed();
         }
         
@@ -25,15 +32,46 @@ namespace ContentApi.Tests.Controllers
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
 
+            var tc = new Content()
+            {
+                Id = _testContentId,
+                GameId = _testGameId,
+                Position = 42,
+                Text = _contentLatest
+            };
+
+            var tc2 = new Content()
+            {
+                Id = Guid.NewGuid(),
+                GameId = _testGameId,
+                Position = 0,
+                Text = _contentOne
+            };
+
+            var tc3 = new Content()
+            {
+                Id = Guid.NewGuid(),
+                GameId = _testGameId,
+                Position = 1,
+                Text = _contentTwo
+            };
+
+            var tc4 = new Content()
+            {
+                Id = Guid.NewGuid(),
+                GameId = Guid.NewGuid(),
+                Position = 43,
+                Text = "other game content"
+            };
+            
+            context.Contents.AddRange(tc, tc2, tc3, tc4);
             context.SaveChanges();
         }
 
-        private ContentController CreateController(ContentContext context, ICollection<Event> events, List<string> contents)
+        private ContentController CreateController(ContentContext context)
         {
             var repository = new ContentRepository(context);
-            var service = new ContentService(
-                repository,
-                MockAggregateService(events, contents));
+            var service = new ContentService(repository);
             return new ContentController(service);
         }
 
@@ -46,9 +84,7 @@ namespace ContentApi.Tests.Controllers
         {
             //arrange
             await using var context = new ContentContext(_dbContextOptions);
-            var contents = new List<string>();
-            contents.AddRange(new string[] { "one", "two", "three", "four", "five" });
-            var controller = CreateController(context, null, contents);
+            var controller = CreateController(context);
             
             //act
             var result = await controller.GetForGame(_testGameId);
@@ -58,7 +94,7 @@ namespace ContentApi.Tests.Controllers
             Assert.NotNull(okObjectResult);
             var apiContents = okObjectResult.Value as ContentViewModel;
             Assert.NotNull(apiContents);
-            Assert.Equal(5, apiContents.Texts.Count);
+            Assert.Equal(3, apiContents.Texts.Count);
         }
         
         #endregion
@@ -70,9 +106,7 @@ namespace ContentApi.Tests.Controllers
         {
             //arrange
             await using var context = new ContentContext(_dbContextOptions);
-            var contents = new List<string>();
-            contents.AddRange(new string[] { "one", "two", "three", "four", "five" });
-            var controller = CreateController(context, null, contents);
+            var controller = CreateController(context);
             
             //act
             var result = await controller.GetLatestForGame(_testGameId);
@@ -82,8 +116,8 @@ namespace ContentApi.Tests.Controllers
             Assert.NotNull(okObjectResult);
             var apiContents = okObjectResult.Value as ContentViewModel;
             Assert.NotNull(apiContents);
-            Assert.Equal(1, apiContents.Texts.Count);
-            Assert.Equal("five", apiContents.Texts.First());
+            Assert.Single(apiContents.Texts);
+            Assert.Equal(_contentLatest, apiContents.Texts.First());
         }
         
         #endregion
@@ -95,16 +129,14 @@ namespace ContentApi.Tests.Controllers
         {
             //arrange
             await using var context = new ContentContext(_dbContextOptions);
-            var contents = new List<string>();
-            contents.AddRange(new string[] { "one", "two", "three", "four", "five" });
-            var controller = CreateController(context, null, contents);
+            var controller = CreateController(context);
             
             //act
             var result = await controller.FilterContent(_testGameId, new ContentFilterRequest()
             {
                 Direction = "f",
-                Start = 2,
-                Count = 2
+                Start = 1,
+                Count = 1
             });
             
             //assert
@@ -112,7 +144,8 @@ namespace ContentApi.Tests.Controllers
             Assert.NotNull(okObjectResult);
             var apiContents = okObjectResult.Value as ContentViewModel;
             Assert.NotNull(apiContents);
-            Assert.Equal(2, apiContents.Texts.Count);
+            Assert.Single(apiContents.Texts);
+            Assert.Equal(_contentTwo, apiContents.Texts.First());
         }
         
         [Fact]
@@ -120,9 +153,7 @@ namespace ContentApi.Tests.Controllers
         {
             //arrange
             await using var context = new ContentContext(_dbContextOptions);
-            var contents = new List<string>();
-            contents.AddRange(new string[] { "one", "two", "three", "four", "five" });
-            var controller = CreateController(context, null, contents);
+            var controller = CreateController(context);
             
             //act
             var result = await controller.FilterContent(_testGameId, new ContentFilterRequest()
