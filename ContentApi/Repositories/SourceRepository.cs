@@ -22,7 +22,7 @@ namespace ContentApi.Repositories
             throw new NotImplementedException();
         }
 
-        public readonly string ENGLISH = "en";
-        public readonly string SPANISH = "esp";
+        public static string ENGLISH = "en";
+        public static string SPANISH = "esp";
     }
 }
