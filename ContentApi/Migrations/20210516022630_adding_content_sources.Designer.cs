@@ -3,15 +3,17 @@ using System;
 using ContentApi.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace ContentApi.Migrations
 {
     [DbContext(typeof(ContentContext))]
-    partial class ContentContextModelSnapshot : ModelSnapshot
+    [Migration("20210516022630_adding_content_sources")]
+    partial class adding_content_sources
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -55,7 +55,9 @@ namespace ContentApi.Tests.EventProcessors
                 repository);
             var gameRepository = new GameRepository(context);
             var gameService = new GameService(gameRepository);
-            return new LocationEnterPassHandler(service, gameService);
+            var sourceRepository = new SourceRepository(context);
+            var sourceService = new SourceService(sourceRepository);
+            return new LocationEnterPassHandler(service, gameService, sourceService);
         }
 
         #endregion
