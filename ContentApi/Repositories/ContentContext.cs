@@ -8,11 +8,10 @@ namespace ContentApi.Repositories {
         public ContentContext(DbContextOptions<ContentContext> options) : base(options){}
         
         public DbSet<Content> Contents { get; set; }
-
         public DbSet<Game> Games { get; set; }
-        
         public DbSet<En> SourcesEn { get; set; }
         public DbSet<Esp> SourcesEsp { get; set; }
+        public DbSet<ConditionalSource> ConditionalSources { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -23,6 +22,7 @@ namespace ContentApi.Repositories {
             modelBuilder.Entity<Game>().ToTable("games");
             modelBuilder.Entity<En>().ToTable("sources_en");
             modelBuilder.Entity<Esp>().ToTable("sources_esp");
+            modelBuilder.Entity<ConditionalSource>().ToTable("conditional_sources");
             
             modelBuilder.Entity<Game>().HasKey(g => g.Id);
             modelBuilder.Entity<Game>().Property(g => g.Id)
@@ -32,6 +32,12 @@ namespace ContentApi.Repositories {
             
             modelBuilder.Entity<Content>().HasKey(c => c.Id);
             modelBuilder.Entity<Content>().Property(c => c.Id)
+                .HasColumnType("uuid")
+                .HasDefaultValueSql("uuid_generate_v4()")
+                .IsRequired();
+            
+            modelBuilder.Entity<ConditionalSource>().HasKey(c => c.Id);
+            modelBuilder.Entity<ConditionalSource>().Property(c => c.Id)
                 .HasColumnType("uuid")
                 .HasDefaultValueSql("uuid_generate_v4()")
                 .IsRequired();
