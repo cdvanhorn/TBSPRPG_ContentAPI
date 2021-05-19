@@ -54,14 +54,14 @@ namespace ContentApi.Tests.Services
             {
                 ContentKey = _testJavaScriptKey,
                 Id = Guid.NewGuid(),
-                JavaScript = $"if(true) {{ return {_testContentKey}; }}"
+                JavaScript = $"function eval() {{ return '{_testContentKey}'; }}"
             };
             
             var badConditionalSource = new ConditionalSource()
             {
-                ContentKey = _testJavaScriptKey,
+                ContentKey = _testBadJavaScriptKey,
                 Id = Guid.NewGuid(),
-                JavaScript = $"lif(true) {{ return {_testContentKey}; }}"
+                JavaScript = $"functin eval() {{ return {_testContentKey}; }}"
             };
             
             context.SourcesEn.AddRange(enSource, enSource2);
