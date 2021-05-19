@@ -12,10 +12,12 @@ namespace ContentApi.Services
     public class SourceService : ISourceService
     {
         private readonly ISourceRepository _repository;
+        private readonly IConditionalSourceRepository _csRepository;
 
-        public SourceService(ISourceRepository repository)
+        public SourceService(ISourceRepository repository, IConditionalSourceRepository conditionalSourceRepository)
         {
             _repository = repository;
+            _csRepository = conditionalSourceRepository;
         }
         
         public Task<string> GetSourceForKey(Guid key, string language = null)
