@@ -28,7 +28,7 @@ namespace ContentApi.EventProcessors {
                 Position = evnt.StreamPosition,
                 Text = await _sourceService.GetSourceForKey(game.AdventureId)
             };
-            _contentService.AddContent(content);
+            await _contentService.AddContent(content);
         }
     }
 }

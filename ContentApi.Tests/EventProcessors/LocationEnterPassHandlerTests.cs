@@ -50,13 +50,13 @@ namespace ContentApi.Tests.EventProcessors
         
         private LocationEnterPassHandler CreateHandler(ContentContext context)
         {
-            var repository = new ContentRepository(context);
             var service = new ContentService(
-                repository);
-            var gameRepository = new GameRepository(context);
-            var gameService = new GameService(gameRepository);
-            var sourceRepository = new SourceRepository(context);
-            var sourceService = new SourceService(sourceRepository);
+                new ContentRepository(context));
+            var gameService = new GameService(
+                new GameRepository(context));
+            var sourceService = new SourceService(
+                new SourceRepository(context),
+                new ConditionalSourceRepository(context));
             return new LocationEnterPassHandler(service, gameService, sourceService);
         }
 

@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using ContentApi.Entities;
 using ContentApi.Entities.LanguageSources;
 using ContentApi.Repositories;
 using ContentApi.Services;
@@ -12,6 +13,9 @@ namespace ContentApi.Tests.Services
         #region Setup
         
         private readonly Guid _testContentKey = Guid.NewGuid();
+        private readonly Guid _testJavaScriptKey = Guid.NewGuid();
+        private readonly Guid _testBadJavaScriptKey = Guid.NewGuid();
+        private readonly Guid _testBadJavaScriptReturnKey = Guid.NewGuid();
         private const string _testEnglishText = "text in english";
         private const string _testSpanishText = "text in spanish";
 
@@ -46,15 +50,50 @@ namespace ContentApi.Tests.Services
                 ContentKey = _testContentKey,
                 Text = _testSpanishText
             };
+
+            var conditionalSource = new ConditionalSource()
+            {
+                ContentKey = _testJavaScriptKey,
+                Id = Guid.NewGuid(),
+                JavaScript = $"function eval() {{ return '{_testContentKey}'; }}"
+            };
+            
+            var conditionalSource2 = new ConditionalSource()
+            {
+                ContentKey = _testJavaScriptKey,
+                Id = Guid.NewGuid(),
+                JavaScript = $"function eval() {{ return gameState.AdventureId; }}"
+            };
+            
+            var badConditionalSource = new ConditionalSource()
+            {
+                ContentKey = _testBadJavaScriptKey,
+                Id = Guid.NewGuid(),
+                JavaScript = $"functin eval() {{ return '{_testContentKey}'; }}"
+            };
+            
+            var badConditionalSource2 = new ConditionalSource()
+            {
+                ContentKey = _testBadJavaScriptReturnKey,
+                Id = Guid.NewGuid(),
+                JavaScript = $"function eval() {{ return 'banana'; }}"
+            };
             
             context.SourcesEn.AddRange(enSource, enSource2);
             context.SourcesEsp.Add(espSource);
+            context.ConditionalSources.AddRange(
+                conditionalSource,
+                conditionalSource2,
+                badConditionalSource,
+                badConditionalSource2);
             context.SaveChanges();
         }
 
         private static SourceService CreateService(ContentContext context)
         {
-            return new SourceService(new SourceRepository(context));
+            return new SourceService(
+                new SourceRepository(context),
+                new ConditionalSourceRepository(context));
         }
         
         #endregion
@@ -76,17 +115,18 @@ namespace ContentApi.Tests.Services
         }
 
         [Fact]
-        public async void GetSourceForKey_InvalidKey_ReturnNone()
+        public async void GetSourceForKey_InvalidKey_ReturnErrorText()
         {
             //arrange
             await using var context = new ContentContext(_dbContextOptions);
             var service = CreateService(context);
             
             //act
-            var text = await service.GetSourceForKey(Guid.NewGuid());
+            var badGuid = Guid.NewGuid();
+            var text = await service.GetSourceForKey(badGuid);
             
             //assert
-            Assert.Null(text);
+            Assert.Equal($"invalid source key {badGuid}", text);
         }
 
         [Fact]
@@ -97,7 +137,7 @@ namespace ContentApi.Tests.Services
             var service = CreateService(context);
             
             //act
-            var text = await service.GetSourceForKey(_testContentKey, SourceRepository.SPANISH);
+            var text = await service.GetSourceForKey(_testContentKey, null, SourceRepository.SPANISH);
             
             //assert
             Assert.Equal(_testSpanishText, text);
@@ -111,12 +151,73 @@ namespace ContentApi.Tests.Services
             var service = CreateService(context);
 
             //act
-            Task Act() => service.GetSourceForKey(_testContentKey, "banana");
+            Task Act() => service.GetSourceForKey(_testContentKey, null, "banana");
 
             //assert
             await Assert.ThrowsAsync<ArgumentException>(Act);
         }
+        
+        [Fact]
+        public async void GetSourceForKey_ValidJavaScript_ReturnSource()
+        {
+            //arrange
+            await using var context = new ContentContext(_dbContextOptions);
+            var service = CreateService(context);
+            
+            //act
+            var text = await service.GetSourceForKey(_testJavaScriptKey);
+            
+            //assert
+            Assert.Equal(_testEnglishText, text);
+        }
+        
+        [Fact]
+        public async void GetSourceForKey_ValidJavaScriptGameState_ReturnSource()
+        {
+            //arrange
+            await using var context = new ContentContext(_dbContextOptions);
+            var service = CreateService(context);
+            var game = new Game()
+            {
+                Id = Guid.NewGuid(),
+                AdventureId = _testContentKey
+            };
+            
+            //act
+            var text = await service.GetSourceForKey(_testJavaScriptKey, game);
+            
+            //assert
+            Assert.Equal(_testEnglishText, text);
+        }
 
+        [Fact]
+        public async void GetSourceForKey_InvalidJavaScript_ReturnErrorText()
+        {
+            //arrange
+            await using var context = new ContentContext(_dbContextOptions);
+            var service = CreateService(context);
+            
+            //act
+            var text = await service.GetSourceForKey(_testBadJavaScriptKey);
+            
+            //assert
+            Assert.Equal($"invalid JavaScript {_testBadJavaScriptKey}", text);
+        }
+        
+        [Fact]
+        public async void GetSourceForKey_InvalidJavaScriptReturn_ReturnErrorText()
+        {
+            //arrange
+            await using var context = new ContentContext(_dbContextOptions);
+            var service = CreateService(context);
+            
+            //act
+            var text = await service.GetSourceForKey(_testBadJavaScriptReturnKey);
+            
+            //assert
+            Assert.Equal($"invalid JavaScript result {_testBadJavaScriptReturnKey}: banana", text);
+        }
+        
         #endregion
     }
 }
