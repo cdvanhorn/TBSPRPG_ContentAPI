@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'TbspRpgAdmin.apps.TbsprpgadminConfig',
+    'UserApi.apps.UserapiConfig'
 ]
 
 MIDDLEWARE = [

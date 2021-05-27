@@ -1,6 +1,3 @@
-from .userapi import EfMigrationHistoryUserApi
-from .userapi import User
-
 from .adventureapi import EfMigrationHistoryAdventureApi
 from .adventureapi import Adventure
 from .adventureapi import LocationAdventureApi
