@@ -1,9 +1,3 @@
-from .gameapi import EfMigrationHistoryGameApi
-from .gameapi import EventTypePositionGameApi
-from .gameapi import ProcessedEventGameApi
-from .gameapi import AdventureGameApi
-from .gameapi import Game
-
 from .mapapi import EfMigrationHistoryMapApi
 from .mapapi import EventTypePositionMapApi
 from .mapapi import ProcessedEventMapApi

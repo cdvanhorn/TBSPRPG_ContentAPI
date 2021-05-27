@@ -5,9 +5,9 @@ from .models import EfMigrationHistory
 from .models import Location
 
 # Register your models here.
-class MultiDBModelAdminUserApi(MultiDBModelAdmin):
+class MultiDBModelAdminAdventureApi(MultiDBModelAdmin):
     using = 'adventureapi'
 
-admin.site.register(Adventure, MultiDBModelAdminUserApi)
-admin.site.register(Location, MultiDBModelAdminUserApi)
-admin.site.register(EfMigrationHistory, MultiDBModelAdminUserApi)
+admin.site.register(Adventure, MultiDBModelAdminAdventureApi)
+admin.site.register(Location, MultiDBModelAdminAdventureApi)
+admin.site.register(EfMigrationHistory, MultiDBModelAdminAdventureApi)
