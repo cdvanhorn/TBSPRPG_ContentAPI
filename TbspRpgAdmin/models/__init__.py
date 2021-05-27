@@ -1,7 +1,3 @@
-from .gamesystemapi import EfMigrationHistoryGameSystemApi
-from .gamesystemapi import EventTypePositionGameSystemApi
-from .gamesystemapi import ProcessedEventGameSystemApi
-
 from .contentapi import EfMigrationHistoryContentApi
 from .contentapi import EventTypePositionContentApi
 from .contentapi import ProcessedEventContentApi

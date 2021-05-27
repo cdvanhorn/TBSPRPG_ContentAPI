@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'UserApi.apps.UserapiConfig',
     'AdventureApi.apps.AdventureapiConfig',
     'GameApi.apps.GameapiConfig',
-    'MapApi.apps.MapapiConfig'
+    'MapApi.apps.MapapiConfig',
+    'GameSystemApi.apps.GamesystemapiConfig'
 ]
 
 MIDDLEWARE = [
