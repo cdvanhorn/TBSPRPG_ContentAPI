@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'TbspRpgAdmin.apps.TbsprpgadminConfig',
     'UserApi.apps.UserapiConfig',
     'AdventureApi.apps.AdventureapiConfig',
-    'GameApi.apps.GameapiConfig'
+    'GameApi.apps.GameapiConfig',
+    'MapApi.apps.MapapiConfig'
 ]
 
 MIDDLEWARE = [
