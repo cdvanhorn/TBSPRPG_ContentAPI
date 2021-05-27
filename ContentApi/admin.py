@@ -1,0 +1,25 @@
+from django.contrib import admin
+from TbspRpgAdmin.admin import MultiDBModelAdmin
+from .models import Content
+from .models import ConditionalSource
+from .models import Game
+from .models import SourceEn
+from .models import SourceEsp
+from .models import EventTypePosition
+from .models import ProcessedEvent
+from .models import EfMigrationHistory
+
+
+# Register your models here.
+class MultiDBModelAdminContentApi(MultiDBModelAdmin):
+    using = 'contentapi'
+
+
+admin.site.register(Content, MultiDBModelAdminContentApi)
+admin.site.register(Game, MultiDBModelAdminContentApi)
+admin.site.register(ConditionalSource, MultiDBModelAdminContentApi)
+admin.site.register(SourceEn, MultiDBModelAdminContentApi)
+admin.site.register(SourceEsp, MultiDBModelAdminContentApi)
+admin.site.register(EventTypePosition, MultiDBModelAdminContentApi)
+admin.site.register(ProcessedEvent, MultiDBModelAdminContentApi)
+admin.site.register(EfMigrationHistory, MultiDBModelAdminContentApi)
