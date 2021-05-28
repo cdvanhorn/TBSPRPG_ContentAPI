@@ -8,6 +8,11 @@ from .models import Location
 class MultiDBModelAdminAdventureApi(MultiDBModelAdmin):
     using = 'adventureapi'
 
-admin.site.register(Adventure, MultiDBModelAdminAdventureApi)
+class MultiDBModelAdminAdventureApiAdventure(MultiDBModelAdmin):
+    using = 'adventureapi'
+
+    list_display = ('id', 'name')
+
+admin.site.register(Adventure, MultiDBModelAdminAdventureApiAdventure)
 admin.site.register(Location, MultiDBModelAdminAdventureApi)
 admin.site.register(EfMigrationHistory, MultiDBModelAdminAdventureApi)

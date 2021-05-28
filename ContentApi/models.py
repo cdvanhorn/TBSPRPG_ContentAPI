@@ -1,5 +1,5 @@
 from django.db import models
-
+import uuid
 
 class EfMigrationHistory(models.Model):
     migrationid = models.CharField(db_column='MigrationId', primary_key=True, max_length=150)  # Field name made lowercase.
@@ -21,7 +21,7 @@ class ConditionalSource(models.Model):
 
 
 class Content(models.Model):
-    id = models.UUIDField(db_column='Id', primary_key=True)  # Field name made lowercase.
+    id = models.UUIDField(db_column='Id', primary_key=True, default=uuid.uuid4, editable=False)  # Field name made lowercase.
     gameid = models.ForeignKey('Game', models.DO_NOTHING, db_column='GameId')  # Field name made lowercase.
     position = models.DecimalField(db_column='Position', max_digits=20, decimal_places=0)  # Field name made lowercase.
     text = models.TextField(db_column='Text', blank=True, null=True)  # Field name made lowercase.
@@ -59,8 +59,8 @@ class ProcessedEvent(models.Model):
 
 
 class SourceEn(models.Model):
-    id = models.UUIDField(db_column='Id', primary_key=True)  # Field name made lowercase.
-    contentkey = models.UUIDField(db_column='ContentKey')  # Field name made lowercase.
+    id = models.UUIDField(db_column='Id', primary_key=True, default=uuid.uuid4, editable=False)  # Field name made lowercase.
+    contentkey = models.UUIDField(db_column='ContentKey', default=uuid.uuid4)  # Field name made lowercase.
     text = models.TextField(db_column='Text', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
@@ -69,8 +69,8 @@ class SourceEn(models.Model):
 
 
 class SourceEsp(models.Model):
-    id = models.UUIDField(db_column='Id', primary_key=True)  # Field name made lowercase.
-    contentkey = models.UUIDField(db_column='ContentKey')  # Field name made lowercase.
+    id = models.UUIDField(db_column='Id', primary_key=True, default=uuid.uuid4, editable=False)  # Field name made lowercase.
+    contentkey = models.UUIDField(db_column='ContentKey', default=uuid.uuid4)  # Field name made lowercase.
     text = models.TextField(db_column='Text', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
