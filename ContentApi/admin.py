@@ -2,7 +2,6 @@ from django.contrib import admin
 from TbspRpgAdmin.admin import MultiDBModelAdmin
 from .models import Content
 from .models import ConditionalSource
-from .models import Game
 from .models import SourceEn
 from .models import SourceEsp
 from .models import EventTypePosition
@@ -22,7 +21,6 @@ class ContentApiSource(MultiDBModelAdminContentApi):
 
 
 admin.site.register(Content, MultiDBModelAdminContentApi)
-admin.site.register(Game, MultiDBModelAdminContentApi)
 admin.site.register(ConditionalSource, MultiDBModelAdminContentApi)
 admin.site.register(SourceEn, ContentApiSource)
 admin.site.register(SourceEsp, ContentApiSource)
