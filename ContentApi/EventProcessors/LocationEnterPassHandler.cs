@@ -11,17 +11,12 @@ namespace ContentApi.EventProcessors {
 
     }
     public class LocationEnterPassHandler : EventHandler, ILocationEnterPassHandler {
-        public LocationEnterPassHandler(IContentService contentService, IGameService gameService, ISourceService sourceService) :
-            base(contentService, gameService, sourceService) {
+        public LocationEnterPassHandler(IContentService contentService, ISourceService sourceService) :
+            base(contentService, sourceService) {
         }
 
         protected override async Task HandleEvent(Game game, Event evnt)
         {
-            var dbGame = await _gameService.GetGameById(game.Id);
-            if (dbGame == null)
-            {
-                throw new Exception("can't process event before game in database");
-            }
             //add some content to the database
             var content = new Content()
             {

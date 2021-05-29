@@ -28,11 +28,6 @@ namespace ContentApi.Tests.EventProcessors
             using var context = new ContentContext(_dbContextOptions);
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
-            
-            var game = new Game()
-            {
-                Id = _testGameId
-            };
 
             var content = new Content()
             {
@@ -42,7 +37,6 @@ namespace ContentApi.Tests.EventProcessors
                 Text = "bananas"
             };
 
-            context.Games.Add(game);
             context.Contents.Add(content);
 
             context.SaveChanges();
@@ -52,12 +46,10 @@ namespace ContentApi.Tests.EventProcessors
         {
             var service = new ContentService(
                 new ContentRepository(context));
-            var gameService = new GameService(
-                new GameRepository(context));
             var sourceService = new SourceService(
                 new SourceRepository(context),
                 new ConditionalSourceRepository(context));
-            return new LocationEnterPassHandler(service, gameService, sourceService);
+            return new LocationEnterPassHandler(service, sourceService);
         }
 
         #endregion
@@ -114,25 +106,6 @@ namespace ContentApi.Tests.EventProcessors
             //assert
             context.SaveChanges();
             Assert.Single(context.Contents.AsQueryable().Where(c => c.GameId == _testGameId));
-        }
-        
-        [Fact]
-        public async void HandleEvent_NoGame_HandlerFail()
-        {
-            //arrange
-            await using var context = new ContentContext(_dbContextOptions);
-            var handler = CreateHandler(context);
-            var agg = new GameAggregate()
-            {
-                Id = Guid.NewGuid().ToString(),
-                AdventureId = Guid.NewGuid().ToString()
-            };
-            
-            //act
-            Task Act() => handler.HandleEvent(agg, null);
-
-            //assert
-            await Assert.ThrowsAsync<Exception>(Act);
         }
 
         #endregion

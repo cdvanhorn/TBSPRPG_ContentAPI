@@ -27,11 +27,6 @@ namespace ContentApi.Tests.EventProcessors
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
 
-            var game = new Game()
-            {
-                Id = _testGameId
-            };
-
             var content = new Content()
             {
                 GameId = _testGameId,
@@ -40,7 +35,6 @@ namespace ContentApi.Tests.EventProcessors
                 Text = "game created"
             };
 
-            context.Games.Add(game);
             context.Contents.Add(content);
             context.SaveChanges();
         }
@@ -49,12 +43,10 @@ namespace ContentApi.Tests.EventProcessors
         {
             var service = new ContentService(
                 new ContentRepository(context));
-            var gameService = new GameService(
-                new GameRepository(context));
             var sourceService = new SourceService(
                 new SourceRepository(context),
                 new ConditionalSourceRepository(context));
-            return new NewGameEventHandler(service, gameService, sourceService);
+            return new NewGameEventHandler(service, sourceService);
         }
 
         #endregion
@@ -62,35 +54,7 @@ namespace ContentApi.Tests.EventProcessors
         #region HandleEvent
 
         [Fact]
-        public async void HandleEvent_DoesntExist_GameCreated()
-        {
-            //arrange
-            await using var context = new ContentContext(_dbContextOptions);
-            var handler = CreateHandler(context);
-            var agg = new GameAggregate()
-            {
-                Id = Guid.NewGuid().ToString(),
-                AdventureId = Guid.NewGuid().ToString()
-            };
-
-            var evnt = new GameNewEvent()
-            {
-                EventId = Guid.NewGuid(),
-                StreamPosition = 43
-            };
-            
-            //act
-            await handler.HandleEvent(agg, evnt);
-            
-            //assert
-            context.SaveChanges();
-            //there should be a new game in the database
-            Assert.NotNull(context.Games.FirstOrDefault(g => g.Id.ToString() == agg.Id));
-            Assert.NotNull(context.Contents.FirstOrDefault(c => c.GameId.ToString() == agg.Id));
-        }
-        
-        [Fact]
-        public async void HandleEvent_GameExists_GameNotCreatedContentCreated()
+        public async void HandleEvent_ContentCreated()
         {
             //arrange
             await using var context = new ContentContext(_dbContextOptions);
@@ -112,8 +76,6 @@ namespace ContentApi.Tests.EventProcessors
             
             //assert
             context.SaveChanges();
-            //there should be a new game in the database
-            Assert.Single(context.Games.AsQueryable().Where(g => g.Id == _testGameId));
             Assert.Equal(2, context.Contents.AsQueryable().Count(c => c.GameId.ToString() == agg.Id));
         }
         
@@ -140,8 +102,6 @@ namespace ContentApi.Tests.EventProcessors
             
             //assert
             context.SaveChanges();
-            //there should be a new game in the database
-            Assert.Single(context.Games.AsQueryable().Where(g => g.Id == _testGameId));
             Assert.Single(context.Contents.AsQueryable().Where(c => c.GameId.ToString() == agg.Id));
         }
 
