@@ -3,6 +3,7 @@ from TbspRpgAdmin.admin import MultiDBModelAdmin
 from .models import Adventure
 from .models import EfMigrationHistory
 from .models import Location
+from .models import Route
 
 # Register your models here.
 class MultiDBModelAdminAdventureApi(MultiDBModelAdmin):
@@ -15,4 +16,5 @@ class MultiDBModelAdminAdventureApiAdventure(MultiDBModelAdmin):
 
 admin.site.register(Adventure, MultiDBModelAdminAdventureApiAdventure)
 admin.site.register(Location, MultiDBModelAdminAdventureApi)
+admin.site.register(Route, MultiDBModelAdminAdventureApi)
 admin.site.register(EfMigrationHistory, MultiDBModelAdminAdventureApi)

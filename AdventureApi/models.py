@@ -26,3 +26,12 @@ class Location(models.Model):
     class Meta:
         managed = False
         db_table = 'locations'
+
+class Route(models.Model):
+    id = models.UUIDField(db_column='Id', primary_key=True)  # Field name made lowercase.
+    locationid = models.ForeignKey(Location, models.DO_NOTHING, db_column='LocationId')  # Field name made lowercase.
+    name = models.TextField(db_column='Name', blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'routes'
