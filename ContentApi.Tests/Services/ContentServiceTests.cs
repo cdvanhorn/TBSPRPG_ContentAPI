@@ -66,7 +66,7 @@ namespace ContentApi.Tests.Services
             context.SaveChanges();
         }
 
-        private ContentService CreateService(ContentContext context)
+        private static ContentService CreateService(ContentContext context)
         {
             var repository = new ContentRepository(context);
             return new ContentService(repository);
@@ -87,9 +87,9 @@ namespace ContentApi.Tests.Services
             var gameContents = await service.GetAllContentForGame(_testGameId);
             
             //assert
-            Assert.Equal(_testGameId, gameContents.Id);
-            Assert.Equal(3, gameContents.Texts.Count);
-            Assert.Equal(_contentOne, gameContents.Texts[0]);
+            Assert.Equal(_testGameId, gameContents.FirstOrDefault().GameId);
+            Assert.Equal(3, gameContents.Count);
+            Assert.Equal(_contentOne, gameContents.FirstOrDefault().Text);
         }
 
         #endregion
@@ -107,9 +107,8 @@ namespace ContentApi.Tests.Services
             var gameContents = await service.GetLatestForGame(_testGameId);
             
             //assert
-            Assert.Equal(_testGameId, gameContents.Id);
-            Assert.Single(gameContents.Texts);
-            Assert.Equal(_contentLatest, gameContents.Texts.First());
+            Assert.Equal(_testGameId, gameContents.GameId);
+            Assert.Equal(_contentLatest, gameContents.Text);
         }
 
         #endregion
@@ -127,9 +126,9 @@ namespace ContentApi.Tests.Services
             var gameContents = await service.GetPartialContentForGame(_testGameId, new ContentFilterRequest());
             
             //assert
-            Assert.Equal(_testGameId, gameContents.Id);
-            Assert.Equal(3, gameContents.Texts.Count);
-            Assert.Equal(_contentOne, gameContents.Texts[0]);
+            Assert.Equal(_testGameId, gameContents.FirstOrDefault().GameId);
+            Assert.Equal(3, gameContents.Count);
+            Assert.Equal(_contentOne, gameContents.FirstOrDefault().Text);
         }
         
         [Fact]
@@ -146,9 +145,9 @@ namespace ContentApi.Tests.Services
             });
             
             //assert
-            Assert.Equal(_testGameId, gameContents.Id);
-            Assert.Equal(3, gameContents.Texts.Count);
-            Assert.Equal(_contentOne, gameContents.Texts[0]);
+            Assert.Equal(_testGameId, gameContents.FirstOrDefault().GameId);
+            Assert.Equal(3, gameContents.Count);
+            Assert.Equal(_contentOne, gameContents.FirstOrDefault().Text);
         }
         
         [Fact]
@@ -166,9 +165,9 @@ namespace ContentApi.Tests.Services
             });
             
             //assert
-            Assert.Equal(_testGameId, gameContents.Id);
-            Assert.Single(gameContents.Texts);
-            Assert.Equal(_contentLatest, gameContents.Texts[0]);
+            Assert.Equal(_testGameId, gameContents.FirstOrDefault().GameId);
+            Assert.Single(gameContents);
+            Assert.Equal(_contentLatest, gameContents.FirstOrDefault().Text);
         }
         
         [Fact]
@@ -187,9 +186,9 @@ namespace ContentApi.Tests.Services
             });
             
             //assert
-            Assert.Equal(_testGameId, gameContents.Id);
-            Assert.Equal(2, gameContents.Texts.Count);
-            Assert.Equal(_contentTwo, gameContents.Texts[0]);
+            Assert.Equal(_testGameId, gameContents.FirstOrDefault().GameId);
+            Assert.Equal(2, gameContents.Count);
+            Assert.Equal(_contentTwo, gameContents.FirstOrDefault().Text);
         }
         
         [Fact]
@@ -207,9 +206,9 @@ namespace ContentApi.Tests.Services
             });
             
             //assert
-            Assert.Equal(_testGameId, gameContents.Id);
-            Assert.Equal(2, gameContents.Texts.Count);
-            Assert.Equal(_contentOne, gameContents.Texts[0]);
+            Assert.Equal(_testGameId, gameContents.FirstOrDefault().GameId);
+            Assert.Equal(2, gameContents.Count);
+            Assert.Equal(_contentOne, gameContents.FirstOrDefault().Text);
         }
         
         [Fact]
@@ -226,9 +225,9 @@ namespace ContentApi.Tests.Services
             });
             
             //assert
-            Assert.Equal(_testGameId, gameContents.Id);
-            Assert.Equal(3, gameContents.Texts.Count);
-            Assert.Equal(_contentLatest, gameContents.Texts[0]);
+            Assert.Equal(_testGameId, gameContents.FirstOrDefault().GameId);
+            Assert.Equal(3, gameContents.Count);
+            Assert.Equal(_contentLatest, gameContents.FirstOrDefault().Text);
         }
         
         [Fact]
@@ -246,9 +245,9 @@ namespace ContentApi.Tests.Services
             });
             
             //assert
-            Assert.Equal(_testGameId, gameContents.Id);
-            Assert.Equal(2, gameContents.Texts.Count);
-            Assert.Equal(_contentTwo, gameContents.Texts[0]);
+            Assert.Equal(_testGameId, gameContents.FirstOrDefault().GameId);
+            Assert.Equal(2, gameContents.Count);
+            Assert.Equal(_contentTwo, gameContents.FirstOrDefault().Text);
         }
         
         [Fact]
@@ -266,9 +265,9 @@ namespace ContentApi.Tests.Services
             });
             
             //assert
-            Assert.Equal(_testGameId, gameContents.Id);
-            Assert.Equal(2, gameContents.Texts.Count);
-            Assert.Equal(_contentLatest, gameContents.Texts[0]);
+            Assert.Equal(_testGameId, gameContents.FirstOrDefault().GameId);
+            Assert.Equal(2, gameContents.Count);
+            Assert.Equal(_contentLatest, gameContents.FirstOrDefault().Text);
         }
         
         [Fact]
@@ -287,9 +286,9 @@ namespace ContentApi.Tests.Services
             });
             
             //assert
-            Assert.Equal(_testGameId, gameContents.Id);
-            Assert.Equal(2, gameContents.Texts.Count);
-            Assert.Equal(_contentOne, gameContents.Texts[1]);
+            Assert.Equal(_testGameId, gameContents.FirstOrDefault().GameId);
+            Assert.Equal(2, gameContents.Count);
+            Assert.Equal(_contentOne, gameContents[1].Text);
         }
         
         [Fact]

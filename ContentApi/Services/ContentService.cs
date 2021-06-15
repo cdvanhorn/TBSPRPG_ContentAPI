@@ -6,14 +6,15 @@ using ContentApi.ViewModels;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using ContentApi.Entities;
 
 namespace ContentApi.Services {
     public interface IContentService : IServiceTrackingService {
-        Task<ContentViewModel> GetAllContentForGame(Guid gameId);
-        Task<ContentViewModel> GetLatestForGame(Guid gameId);
-        Task<ContentViewModel> GetPartialContentForGame(Guid gameId, ContentFilterRequest filterRequest);
+        Task<List<Content>> GetAllContentForGame(Guid gameId);
+        Task<Content> GetLatestForGame(Guid gameId);
+        Task<List<Content>> GetPartialContentForGame(Guid gameId, ContentFilterRequest filterRequest);
         Task AddContent(Content content);
     }
 
@@ -24,19 +25,19 @@ namespace ContentApi.Services {
             _repository = repository;
         }
 
-        public async Task<ContentViewModel> GetAllContentForGame(Guid gameId)
+        public async Task<List<Content>> GetAllContentForGame(Guid gameId)
         {
             var contents = await _repository.GetContentForGame(gameId);
-            return new ContentViewModel(contents);
+            return contents;
         }
 
-        public async Task<ContentViewModel> GetLatestForGame(Guid gameId)
+        public async Task<Content> GetLatestForGame(Guid gameId)
         {
             var contents = await _repository.GetContentForGameReverse(gameId, null, 1);
-            return new ContentViewModel(contents);
+            return contents.FirstOrDefault();
         }
 
-        public async Task<ContentViewModel> GetPartialContentForGame(Guid gameId, ContentFilterRequest filterRequest)
+        public async Task<List<Content>> GetPartialContentForGame(Guid gameId, ContentFilterRequest filterRequest)
         {
             List<Content> contents = null;
             if (string.IsNullOrEmpty(filterRequest.Direction) || filterRequest.IsForward())
@@ -59,7 +60,7 @@ namespace ContentApi.Services {
                 throw new ArgumentException($"invalid direction argument {filterRequest.Direction}");
             }
 
-            return new ContentViewModel(contents);
+            return contents;
         }
 
         public async Task AddContent(Content content)

@@ -65,11 +65,9 @@ namespace ContentApi.Services
             var backupKey = key;
             if (jsResult != null && !Guid.TryParse(jsResult, out key))
                 return string.Format(INVALID_JAVASCRIPT_RESULT, backupKey, jsResult);
-            
+
             var text = await _repository.GetSourceForKey(key, language);
-            if(text == null)
-                return string.Format(INVALID_SOURCE_KEY, key);
-            return text;
+            return text ?? string.Format(INVALID_SOURCE_KEY, key);
         }
     }
 }

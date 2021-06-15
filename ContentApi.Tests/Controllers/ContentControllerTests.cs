@@ -68,11 +68,14 @@ namespace ContentApi.Tests.Controllers
             context.SaveChanges();
         }
 
-        private ContentController CreateController(ContentContext context)
+        private static ContentController CreateController(ContentContext context)
         {
             var repository = new ContentRepository(context);
+            var sourceRepository = new SourceRepository(context);
+            var conditionalSourceRepository = new ConditionalSourceRepository(context);
             var service = new ContentService(repository);
-            return new ContentController(service);
+            var sourceService = new SourceService(sourceRepository, conditionalSourceRepository);
+            return new ContentController(service, sourceService);
         }
 
         #endregion
