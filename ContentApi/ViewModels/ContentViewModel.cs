@@ -18,6 +18,14 @@ namespace ContentApi.ViewModels {
             }
         }
 
+        public ContentViewModel(Content content)
+        {
+            Texts = new List<string>();
+            Id = content.GameId;
+            Index = content.Position;
+            Texts.Add(content.Text);
+        }
+
         public Guid Id { get; set; }
 
         public List<string> Texts { get; set; }

@@ -21,7 +21,7 @@ namespace ContentApi.Controllers {
         public async Task<IActionResult> GetForGame(Guid gameId)
         {
             var content = await _contentService.GetAllContentForGame(gameId);
-            return Ok(content);
+            return Ok(new ContentViewModel(content));
         }
         
         [Authorize, HttpGet("{language:string}/{sourceKey:guid}")]
@@ -39,7 +39,7 @@ namespace ContentApi.Controllers {
         [Authorize, Route("latest/{gameId:guid}")]
         public async Task<IActionResult> GetLatestForGame(Guid gameId) {
             var content = await _contentService.GetLatestForGame(gameId);
-            return Ok(content);
+            return Ok(new ContentViewModel(content));
         }
 
         [Authorize, HttpGet("filter/{gameId:guid}")]
@@ -47,7 +47,7 @@ namespace ContentApi.Controllers {
             try
             {
                 var content = await _contentService.GetPartialContentForGame(gameId, filterRequest);
-                return Ok(content);
+                return Ok(new ContentViewModel(content));
             }
             catch (Exception e)
             {
