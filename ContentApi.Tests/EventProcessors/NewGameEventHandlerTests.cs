@@ -46,7 +46,9 @@ namespace ContentApi.Tests.EventProcessors
             var sourceService = new SourceService(
                 new SourceRepository(context),
                 new ConditionalSourceRepository(context));
-            return new NewGameEventHandler(service, sourceService);
+            var gameService = new GameService(
+                new GameRepository(context));
+            return new NewGameEventHandler(service, sourceService, gameService);
         }
 
         #endregion
@@ -77,6 +79,7 @@ namespace ContentApi.Tests.EventProcessors
             //assert
             context.SaveChanges();
             Assert.Equal(2, context.Contents.AsQueryable().Count(c => c.GameId.ToString() == agg.Id));
+            Assert.Single(context.Games);
         }
         
         [Fact]
@@ -85,10 +88,17 @@ namespace ContentApi.Tests.EventProcessors
             //arrange
             await using var context = new ContentContext(_dbContextOptions);
             var handler = CreateHandler(context);
+            var adventureId = Guid.NewGuid();
+            context.Games.Add(new Game()
+            {
+                Id = _testGameId,
+                AdventureId = adventureId
+            });
+            context.SaveChanges();
             var agg = new GameAggregate()
             {
                 Id = _testGameId.ToString(),
-                AdventureId = Guid.NewGuid().ToString()
+                AdventureId = adventureId.ToString()
             };
             
             var evnt = new GameNewEvent()
@@ -103,6 +113,7 @@ namespace ContentApi.Tests.EventProcessors
             //assert
             context.SaveChanges();
             Assert.Single(context.Contents.AsQueryable().Where(c => c.GameId.ToString() == agg.Id));
+            Assert.Single(context.Games);
         }
 
         #endregion

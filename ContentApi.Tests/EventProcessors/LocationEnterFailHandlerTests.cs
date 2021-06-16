@@ -49,7 +49,9 @@ namespace ContentApi.Tests.EventProcessors
             var sourceService = new SourceService(
                 new SourceRepository(context),
                 new ConditionalSourceRepository(context));
-            return new LocationEnterFailHandler(service, sourceService);
+            var gameService = new GameService(
+                new GameRepository(context));
+            return new LocationEnterFailHandler(service, sourceService, gameService);
         }
 
         #endregion

@@ -15,12 +15,14 @@ namespace ContentApi.EventProcessors {
     {
         protected IContentService _contentService;
         protected ISourceService _sourceService;
+        protected IGameService _gameService;
         private IGameAggregateAdapter _gameAggregateAdapter;
 
-        public EventHandler(IContentService contentService, ISourceService sourceService)
+        public EventHandler(IContentService contentService, ISourceService sourceService, IGameService gameService)
         {
             _contentService = contentService;
             _sourceService = sourceService;
+            _gameService = gameService;
             _gameAggregateAdapter = new GameAggregateAdapter();
         }
 

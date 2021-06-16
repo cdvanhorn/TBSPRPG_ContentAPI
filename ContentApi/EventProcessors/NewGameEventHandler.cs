@@ -13,11 +13,13 @@ namespace ContentApi.EventProcessors {
 
     public class NewGameEventHandler : EventHandler, INewGameEventHandler {
 
-        public NewGameEventHandler(IContentService contentService, ISourceService sourceService) :
-            base(contentService, sourceService) {
+        public NewGameEventHandler(IContentService contentService, ISourceService sourceService, IGameService gameService) :
+            base(contentService, sourceService, gameService) {
         }
 
-        protected override async Task HandleEvent(Game game, Event evnt) {
+        protected override async Task HandleEvent(Game game, Event evnt)
+        {
+            await _gameService.AddGame(game);
             var content = new Content()
             {
                 GameId = game.Id,

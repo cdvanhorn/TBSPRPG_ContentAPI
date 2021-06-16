@@ -3,15 +3,17 @@ using System;
 using ContentApi.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace ContentApi.Migrations
 {
     [DbContext(typeof(ContentContext))]
-    partial class ContentContextModelSnapshot : ModelSnapshot
+    [Migration("20210616015231_AddLanguageToGame")]
+    partial class AddLanguageToGame
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -70,7 +72,6 @@ namespace ContentApi.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Language")
-                        .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasColumnType("text")
                         .HasDefaultValue("en");

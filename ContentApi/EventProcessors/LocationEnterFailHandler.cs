@@ -11,8 +11,8 @@ namespace ContentApi.EventProcessors {
 
     }
     public class LocationEnterFailHandler : EventHandler, ILocationEnterFailHandler {
-        public LocationEnterFailHandler(IContentService contentService, ISourceService sourceService) :
-            base(contentService, sourceService) {
+        public LocationEnterFailHandler(IContentService contentService, ISourceService sourceService, IGameService gameService) :
+            base(contentService, sourceService, gameService) {
         }
 
         protected override async Task HandleEvent(Game game, Event evnt) {

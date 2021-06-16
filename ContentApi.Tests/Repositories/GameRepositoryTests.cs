@@ -26,7 +26,8 @@ namespace ContentApi.Tests.Repositories
 
             var testGame = new Game()
             {
-                Id = _testGameId
+                Id = _testGameId,
+                Language = "en"
             };
 
             var testGame2 = new Game()
@@ -55,6 +56,7 @@ namespace ContentApi.Tests.Repositories
             //assert
             Assert.Equal(2, games.Count);
             Assert.Equal(_testGameId, games.First().Id);
+            Assert.Equal("en", games.First().Language);
         }
 
         #endregion

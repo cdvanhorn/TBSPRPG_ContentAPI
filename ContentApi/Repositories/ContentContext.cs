@@ -29,6 +29,9 @@ namespace ContentApi.Repositories {
                 .HasColumnType("uuid")
                 .HasDefaultValueSql("uuid_generate_v4()")
                 .IsRequired();
+            modelBuilder.Entity<Game>().Property(g => g.Language)
+                .HasDefaultValue("en")
+                .IsRequired();
             
             modelBuilder.Entity<Content>().HasKey(c => c.Id);
             modelBuilder.Entity<Content>().Property(c => c.Id)
