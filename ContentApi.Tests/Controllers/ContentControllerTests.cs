@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ContentApi.Controllers;
 using ContentApi.Entities;
+using ContentApi.Entities.LanguageSources;
 using ContentApi.Repositories;
 using ContentApi.Services;
 using ContentApi.ViewModels;
@@ -17,6 +18,9 @@ namespace ContentApi.Tests.Controllers
         #region Setup
 
         private readonly Guid _testContentId;
+        private readonly Guid _testContentKey = Guid.NewGuid();
+        private readonly Guid _testGameId = Guid.NewGuid();
+        private const string _testEnglishText = "text in english";
         private readonly string _contentOne = "first content";
         private readonly string _contentTwo = "second content";
         private readonly string _contentLatest = "latest content";
@@ -31,6 +35,27 @@ namespace ContentApi.Tests.Controllers
             using var context = new ContentContext(_dbContextOptions);
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
+
+            var game = new Game()
+            {
+                Id = _testGameId,
+                AdventureId = Guid.NewGuid(),
+                Language = "en"
+            };
+            
+            var enSource = new En()
+            {
+                Id = Guid.NewGuid(),
+                ContentKey = _testContentKey,
+                Text = _testEnglishText
+            };
+            
+            var enSource2 = new En()
+            {
+                Id = Guid.NewGuid(),
+                ContentKey = Guid.NewGuid(),
+                Text = "other english text"
+            };
 
             var tc = new Content()
             {
@@ -64,7 +89,9 @@ namespace ContentApi.Tests.Controllers
                 Text = "other game content"
             };
             
+            context.SourcesEn.AddRange(enSource, enSource2);
             context.Contents.AddRange(tc, tc2, tc3, tc4);
+            context.Games.Add(game);
             context.SaveChanges();
         }
 
@@ -75,7 +102,8 @@ namespace ContentApi.Tests.Controllers
             var conditionalSourceRepository = new ConditionalSourceRepository(context);
             var service = new ContentService(repository);
             var sourceService = new SourceService(sourceRepository, conditionalSourceRepository);
-            return new ContentController(service, sourceService);
+            var gameService = new GameService(new GameRepository(context));
+            return new ContentController(service, sourceService, gameService);
         }
 
         #endregion
@@ -172,6 +200,103 @@ namespace ContentApi.Tests.Controllers
             Assert.Equal(400, badRequestResult.StatusCode);
         }
 
+        #endregion
+        
+        #region GetSourceContent
+
+        [Fact]
+        public async void GetSourceContent_Valid_ReturnSource()
+        {
+            //arrange
+            await using var context = new ContentContext(_dbContextOptions);
+            var controller = CreateController(context);
+            
+            //act
+            var result = await controller.GetSourceContent("en", _testContentKey);
+
+            //assert
+            var okObjectResult = result as OkObjectResult;
+            Assert.NotNull(okObjectResult);
+            var sourceViewModel = okObjectResult.Value as SourceViewModel;
+            Assert.NotNull(sourceViewModel);
+            Assert.Equal(_testContentKey, sourceViewModel.Id);
+            Assert.Equal("en", sourceViewModel.Language);
+            Assert.Equal(_testEnglishText, sourceViewModel.Source);
+        }
+        
+        [Fact]
+        public async void GetSourceContent_ValidGame_ReturnSource()
+        {
+            //arrange
+            await using var context = new ContentContext(_dbContextOptions);
+            var controller = CreateController(context);
+            
+            //act
+            var result = await controller.GetSourceContent(_testGameId, _testContentKey);
+
+            //assert
+            var okObjectResult = result as OkObjectResult;
+            Assert.NotNull(okObjectResult);
+            var sourceViewModel = okObjectResult.Value as SourceViewModel;
+            Assert.NotNull(sourceViewModel);
+            Assert.Equal(_testContentKey, sourceViewModel.Id);
+            Assert.Equal("en", sourceViewModel.Language);
+            Assert.Equal(_testEnglishText, sourceViewModel.Source);
+        }
+        
+        [Fact]
+        public async void GetSourceContent_InValidLanguage_ReturnError()
+        {
+            //arrange
+            await using var context = new ContentContext(_dbContextOptions);
+            var controller = CreateController(context);
+            
+            //act
+            var result = await controller.GetSourceContent("eng", _testContentKey);
+
+            //assert
+            var badRequestResult = result as BadRequestObjectResult;
+            Assert.NotNull(badRequestResult);
+            Assert.Equal(400, badRequestResult.StatusCode);
+        }
+        
+        [Fact]
+        public async void GetSourceContent_InValidGame_ReturnError()
+        {
+            //arrange
+            await using var context = new ContentContext(_dbContextOptions);
+            var controller = CreateController(context);
+            
+            //act
+            var result = await controller.GetSourceContent(Guid.NewGuid(), _testContentKey);
+
+            //assert
+            var badRequestResult = result as BadRequestObjectResult;
+            Assert.NotNull(badRequestResult);
+            Assert.Equal(400, badRequestResult.StatusCode);
+        }
+        
+        [Fact]
+        public async void GetSourceContent_InValidKey_ReturnSourceError()
+        {
+            //arrange
+            await using var context = new ContentContext(_dbContextOptions);
+            var controller = CreateController(context);
+            var invalidKey = Guid.NewGuid();
+            
+            //act
+            var result = await controller.GetSourceContent("en", invalidKey);
+
+            //assert
+            var okObjectResult = result as OkObjectResult;
+            Assert.NotNull(okObjectResult);
+            var sourceViewModel = okObjectResult.Value as SourceViewModel;
+            Assert.NotNull(sourceViewModel);
+            Assert.Equal(invalidKey, sourceViewModel.Id);
+            Assert.Equal("en", sourceViewModel.Language);
+            Assert.Equal($"invalid source key {invalidKey}", sourceViewModel.Source);
+        }
+        
         #endregion
     }
 }

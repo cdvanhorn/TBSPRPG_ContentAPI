@@ -11,10 +11,12 @@ namespace ContentApi.Controllers {
     public class ContentController : ControllerBase {
         private readonly IContentService _contentService;
         private readonly ISourceService _sourceService;
+        private readonly IGameService _gameService;
 
-        public ContentController(IContentService contentService, ISourceService sourceService) {
+        public ContentController(IContentService contentService, ISourceService sourceService, IGameService gameService) {
             _contentService = contentService;
             _sourceService = sourceService;
+            _gameService = gameService;
         }
 
         [Authorize, HttpGet("{gameId:guid}")]
@@ -24,14 +26,37 @@ namespace ContentApi.Controllers {
             return Ok(new ContentViewModel(content));
         }
         
-        [Authorize, HttpGet("{language:string}/{sourceKey:guid}")]
+        [Authorize, HttpGet("source/{language:string}/{sourceKey:guid}")]
         public async Task<IActionResult> GetSourceContent(string language, Guid sourceKey)
         {
-            var source = await _sourceService.GetSourceForKey(sourceKey, null, language);
+            try
+            {
+                var source = await _sourceService.GetSourceForKey(sourceKey, null, language);
+                return Ok(new SourceViewModel()
+                {
+                    Id = sourceKey,
+                    Language = language,
+                    Source = source
+                });
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
+        }
+        
+        [Authorize, HttpGet("source/{gameId:guid}/{sourceKey:guid}")]
+        public async Task<IActionResult> GetSourceContent(Guid gameId, Guid sourceKey)
+        {
+            var game = await _gameService.GetGameById(gameId);
+            if(game == null)
+                return BadRequest(new { message = $"invalid game id {gameId}" });
+            
+            var source = await _sourceService.GetSourceForKey(sourceKey, null, game.Language);
             return Ok(new SourceViewModel()
             {
                 Id = sourceKey,
-                Language = language,
+                Language = game.Language,
                 Source = source
             });
         }
