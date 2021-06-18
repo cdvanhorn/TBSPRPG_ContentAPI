@@ -16,7 +16,8 @@ namespace ContentApi.Adapters
             return new Game()
             {
                 Id = Guid.Parse(aggregate.Id),
-                AdventureId = Guid.Parse(aggregate.AdventureId)
+                AdventureId = Guid.Parse(aggregate.AdventureId),
+                Language = aggregate.Settings.Language
             };
         }
     }

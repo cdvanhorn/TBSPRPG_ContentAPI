@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using ContentApi.Entities;
 using ContentApi.Entities.LanguageSources;
 using Microsoft.EntityFrameworkCore;
+using TbspRpgLib.Settings;
 
 namespace ContentApi.Repositories
 {
@@ -23,7 +24,7 @@ namespace ContentApi.Repositories
         
         public Task<string> GetSourceForKey(Guid key, string language = null)
         {
-            if (language == null || language == ENGLISH)
+            if (language == null || language == Languages.ENGLISH)
             {
                 return _context.SourcesEn.AsQueryable()
                     .Where(s => s.ContentKey == key)
@@ -31,7 +32,7 @@ namespace ContentApi.Repositories
                     .FirstOrDefaultAsync();
             }
             
-            if (language == SPANISH)
+            if (language == Languages.SPANISH)
             {
                 return _context.SourcesEsp.AsQueryable()
                     .Where(s => s.ContentKey == key)
@@ -41,8 +42,5 @@ namespace ContentApi.Repositories
             
             throw new ArgumentException($"invalid language {language}");
         }
-
-        public static string ENGLISH = "en";
-        public static string SPANISH = "esp";
     }
 }

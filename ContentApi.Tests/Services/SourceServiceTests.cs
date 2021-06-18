@@ -4,6 +4,7 @@ using ContentApi.Entities;
 using ContentApi.Entities.LanguageSources;
 using ContentApi.Repositories;
 using ContentApi.Services;
+using TbspRpgLib.Settings;
 using Xunit;
 
 namespace ContentApi.Tests.Services
@@ -137,7 +138,7 @@ namespace ContentApi.Tests.Services
             var service = CreateService(context);
             
             //act
-            var text = await service.GetSourceForKey(_testContentKey, null, SourceRepository.SPANISH);
+            var text = await service.GetSourceForKey(_testContentKey, null, Languages.SPANISH);
             
             //assert
             Assert.Equal(_testSpanishText, text);

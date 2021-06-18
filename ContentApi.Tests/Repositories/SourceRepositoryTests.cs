@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using ContentApi.Entities;
 using ContentApi.Entities.LanguageSources;
 using ContentApi.Repositories;
+using TbspRpgLib.Settings;
 using Xunit;
 
 namespace ContentApi.Tests.Repositories
@@ -92,7 +93,7 @@ namespace ContentApi.Tests.Repositories
             var repository = new SourceRepository(context);
             
             //act
-            var text = await repository.GetSourceForKey(_testContentKey, SourceRepository.SPANISH);
+            var text = await repository.GetSourceForKey(_testContentKey, Languages.SPANISH);
             
             //assert
             Assert.Equal(_testSpanishText, text);

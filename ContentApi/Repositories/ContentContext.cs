@@ -2,6 +2,7 @@ using ContentApi.Entities;
 using ContentApi.Entities.LanguageSources;
 using Microsoft.EntityFrameworkCore;
 using TbspRpgLib.Repositories;
+using TbspRpgLib.Settings;
 
 namespace ContentApi.Repositories {
     public class ContentContext : ServiceTrackingContext {
@@ -30,7 +31,7 @@ namespace ContentApi.Repositories {
                 .HasDefaultValueSql("uuid_generate_v4()")
                 .IsRequired();
             modelBuilder.Entity<Game>().Property(g => g.Language)
-                .HasDefaultValue("en")
+                .HasDefaultValue(Languages.ENGLISH)
                 .IsRequired();
             
             modelBuilder.Entity<Content>().HasKey(c => c.Id);

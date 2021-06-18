@@ -8,6 +8,7 @@ using ContentApi.Services;
 using TbspRpgLib.Aggregates;
 using TbspRpgLib.Events;
 using TbspRpgLib.Events.Game;
+using TbspRpgLib.Settings;
 using Xunit;
 
 namespace ContentApi.Tests.EventProcessors
@@ -64,7 +65,11 @@ namespace ContentApi.Tests.EventProcessors
             var agg = new GameAggregate()
             {
                 Id = _testGameId.ToString(),
-                AdventureId = Guid.NewGuid().ToString()
+                AdventureId = Guid.NewGuid().ToString(),
+                Settings = new Settings()
+                {
+                    Language = Languages.ENGLISH
+                }
             };
             
             var evnt = new GameNewEvent()
@@ -80,6 +85,7 @@ namespace ContentApi.Tests.EventProcessors
             context.SaveChanges();
             Assert.Equal(2, context.Contents.AsQueryable().Count(c => c.GameId.ToString() == agg.Id));
             Assert.Single(context.Games);
+            Assert.Equal(Languages.ENGLISH, context.Games.First().Language);
         }
         
         [Fact]
