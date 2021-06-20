@@ -26,7 +26,7 @@ namespace ContentApi.Controllers {
             return Ok(new ContentViewModel(content));
         }
         
-        [Authorize, HttpGet("source/{language:string}/{sourceKey:guid}")]
+        [Authorize, HttpGet("source/{language}/{sourceKey:guid}")]
         public async Task<IActionResult> GetSourceContent(string language, Guid sourceKey)
         {
             try
