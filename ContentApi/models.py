@@ -68,3 +68,12 @@ class SourceEsp(models.Model):
     class Meta:
         managed = False
         db_table = 'sources_esp'
+
+class Game(models.Model):
+    id = models.UUIDField(db_column='Id', primary_key=True)  # Field name made lowercase.
+    adventureid = models.UUIDField(db_column='AdventureId')  # Field name made lowercase.
+    language = models.TextField(db_column='Language')  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'games'

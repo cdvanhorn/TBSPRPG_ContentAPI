@@ -53,6 +53,7 @@ class Route(models.Model):
     name = models.TextField(db_column='Name', blank=True, null=True)  # Field name made lowercase.
     locationid = models.ForeignKey(Location, models.DO_NOTHING, db_column='LocationId')  # Field name made lowercase.
     routeid = models.UUIDField(db_column='RouteId')  # Field name made lowercase.
+    content = models.TextField(db_column='Content', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False

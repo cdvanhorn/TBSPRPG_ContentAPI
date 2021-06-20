@@ -7,7 +7,7 @@ from .models import SourceEsp
 from .models import EventTypePosition
 from .models import ProcessedEvent
 from .models import EfMigrationHistory
-
+from .models import Game
 
 # Register your models here.
 class MultiDBModelAdminContentApi(MultiDBModelAdmin):
@@ -22,6 +22,7 @@ class ContentApiSource(MultiDBModelAdminContentApi):
 
 admin.site.register(Content, MultiDBModelAdminContentApi)
 admin.site.register(ConditionalSource, MultiDBModelAdminContentApi)
+admin.site.register(Game, MultiDBModelAdminContentApi)
 admin.site.register(SourceEn, ContentApiSource)
 admin.site.register(SourceEsp, ContentApiSource)
 admin.site.register(EventTypePosition, MultiDBModelAdminContentApi)
