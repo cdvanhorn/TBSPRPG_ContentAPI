@@ -16,7 +16,10 @@ namespace ContentApi.EventProcessors {
         protected IContentService _contentService;
         protected ISourceService _sourceService;
         protected IGameService _gameService;
-        private IGameAggregateAdapter _gameAggregateAdapter;
+        protected IGameAggregateAdapter _gameAggregateAdapter;
+        
+        //entities to be used by the handlers
+        protected Game _game;
 
         public EventHandler(IContentService contentService, ISourceService sourceService, IGameService gameService)
         {
@@ -28,11 +31,10 @@ namespace ContentApi.EventProcessors {
 
         public Task HandleEvent(GameAggregate gameAggregate, Event evnt)
         {
-            return HandleEvent(
-                _gameAggregateAdapter.ToEntity(gameAggregate),
-                evnt);
+            _game = _gameAggregateAdapter.ToEntity(gameAggregate);
+            return HandleEvent(evnt);
         }
 
-        protected abstract Task HandleEvent(Game game, Event evnt);
+        protected abstract Task HandleEvent(Event evnt);
     }
 }

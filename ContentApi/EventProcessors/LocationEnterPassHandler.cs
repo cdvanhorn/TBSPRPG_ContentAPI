@@ -15,14 +15,14 @@ namespace ContentApi.EventProcessors {
             base(contentService, sourceService, gameService) {
         }
 
-        protected override async Task HandleEvent(Game game, Event evnt)
+        protected override async Task HandleEvent(Event evnt)
         {
             //add some content to the database
             var content = new Content()
             {
-                GameId = game.Id,
+                GameId = _game.Id,
                 Position = evnt.StreamPosition,
-                Text = $"{game.Id} successfully entered a location"
+                Text = $"{_game.Id} successfully entered a location"
             };
             await _contentService.AddContent(content);
         }
