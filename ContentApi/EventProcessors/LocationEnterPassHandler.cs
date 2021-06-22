@@ -22,7 +22,7 @@ namespace ContentApi.EventProcessors {
             {
                 GameId = _game.Id,
                 Position = evnt.StreamPosition,
-                Text = $"{_game.Id} successfully entered a location"
+                Text = await _sourceService.GetSourceForKey(_location.CurrentLocation)
             };
             await _contentService.AddContent(content);
         }

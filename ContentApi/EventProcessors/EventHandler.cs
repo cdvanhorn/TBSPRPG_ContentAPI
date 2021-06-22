@@ -20,6 +20,7 @@ namespace ContentApi.EventProcessors {
         
         //entities to be used by the handlers
         protected Game _game;
+        protected Location _location;
 
         public EventHandler(IContentService contentService, ISourceService sourceService, IGameService gameService)
         {
@@ -32,6 +33,7 @@ namespace ContentApi.EventProcessors {
         public Task HandleEvent(GameAggregate gameAggregate, Event evnt)
         {
             _game = _gameAggregateAdapter.ToEntity(gameAggregate);
+            _location = _gameAggregateAdapter.ToLocation(gameAggregate);
             return HandleEvent(evnt);
         }
 

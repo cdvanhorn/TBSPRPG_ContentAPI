@@ -7,6 +7,7 @@ namespace ContentApi.Adapters
     public interface IGameAggregateAdapter
     {
         Game ToEntity(GameAggregate aggregate);
+        Location ToLocation(GameAggregate aggregate);
     }
     
     public class GameAggregateAdapter : IGameAggregateAdapter
@@ -18,6 +19,14 @@ namespace ContentApi.Adapters
                 Id = Guid.Parse(aggregate.Id),
                 AdventureId = Guid.Parse(aggregate.AdventureId),
                 Language = aggregate.Settings.Language
+            };
+        }
+
+        public Location ToLocation(GameAggregate aggregate)
+        {
+            return new Location()
+            {
+                CurrentLocation = Guid.Parse(aggregate.MapData.CurrentLocation)
             };
         }
     }
