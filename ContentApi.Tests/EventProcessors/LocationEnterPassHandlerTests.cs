@@ -67,7 +67,11 @@ namespace ContentApi.Tests.EventProcessors
             var agg = new GameAggregate()
             {
                 Id = _testGameId.ToString(),
-                AdventureId = Guid.NewGuid().ToString()
+                AdventureId = Guid.NewGuid().ToString(),
+                MapData = new MapData()
+                {
+                    CurrentLocation = Guid.NewGuid().ToString()
+                }
             };
 
             var evnt = new LocationEnterPassEvent()
@@ -93,7 +97,11 @@ namespace ContentApi.Tests.EventProcessors
             var agg = new GameAggregate()
             {
                 Id = _testGameId.ToString(),
-                AdventureId = Guid.NewGuid().ToString()
+                AdventureId = Guid.NewGuid().ToString(),
+                MapData = new MapData()
+                {
+                    CurrentLocation = Guid.NewGuid().ToString()
+                }
             };
 
             var evnt = new LocationEnterPassEvent()
