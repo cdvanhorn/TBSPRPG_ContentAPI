@@ -69,6 +69,15 @@ namespace ContentApi.Controllers {
                 return Ok(new ContentViewModel(content));
             return Ok();
         }
+        
+        [Authorize, Route("after/{gameId:guid}/{position: ulong}")]
+        public async Task<IActionResult> GetContentAfterPosition(Guid gameId, ulong position) {
+            var content = await _contentService.GetContentForGameAfterPosition(gameId, position);
+            //the new game event may not have been handled yet, I should add that to the tests
+            if(content.Count > 0)
+                return Ok(new ContentViewModel(content));
+            return Ok();
+        }
 
         [Authorize, HttpGet("filter/{gameId:guid}")]
         public async Task<IActionResult> FilterContent(Guid gameId, [FromQuery] ContentFilterRequest filterRequest) {

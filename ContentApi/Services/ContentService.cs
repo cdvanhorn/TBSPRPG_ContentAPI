@@ -14,6 +14,7 @@ namespace ContentApi.Services {
     public interface IContentService : IServiceTrackingService {
         Task<List<Content>> GetAllContentForGame(Guid gameId);
         Task<Content> GetLatestForGame(Guid gameId);
+        Task<List<Content>> GetContentForGameAfterPosition(Guid gameId, ulong position);
         Task<List<Content>> GetPartialContentForGame(Guid gameId, ContentFilterRequest filterRequest);
         Task AddContent(Content content);
     }
@@ -35,6 +36,11 @@ namespace ContentApi.Services {
         {
             var contents = await _repository.GetContentForGameReverse(gameId, null, 1);
             return contents.FirstOrDefault();
+        }
+        
+        public async Task<List<Content>> GetContentForGameAfterPosition(Guid gameId, ulong position)
+        {
+            return await _repository.GetContentForGameAfterPosition(gameId, position);
         }
 
         public async Task<List<Content>> GetPartialContentForGame(Guid gameId, ContentFilterRequest filterRequest)
