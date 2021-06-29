@@ -64,7 +64,10 @@ namespace ContentApi.Controllers {
         [Authorize, Route("latest/{gameId:guid}")]
         public async Task<IActionResult> GetLatestForGame(Guid gameId) {
             var content = await _contentService.GetLatestForGame(gameId);
-            return Ok(new ContentViewModel(content));
+            //the new game event may not have been handled yet, I should add that to the tests
+            if(content != null)
+                return Ok(new ContentViewModel(content));
+            return Ok();
         }
 
         [Authorize, HttpGet("filter/{gameId:guid}")]

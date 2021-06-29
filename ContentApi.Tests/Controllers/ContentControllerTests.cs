@@ -151,6 +151,26 @@ namespace ContentApi.Tests.Controllers
             Assert.Equal(_contentLatest, apiContents.Texts.First());
         }
         
+        [Fact]
+        public async void GetLatestForGame_NoGame_ReturnEmptyReponse()
+        {
+            //arrange
+            await using var context = new ContentContext(_dbContextOptions);
+            var controller = CreateController(context);
+            
+            //act
+            var result = await controller.GetLatestForGame(Guid.NewGuid());
+            
+            //assert
+            var okResult = result as OkResult;
+            Assert.NotNull(okResult);
+            Assert.Equal(200, okResult.StatusCode);
+            // var apiContents = okObjectResult.Value as ContentViewModel;
+            // Assert.NotNull(apiContents);
+            // Assert.Single(apiContents.Texts);
+            // Assert.Equal(_contentLatest, apiContents.Texts.First());
+        }
+        
         #endregion
 
         #region FilterContent
