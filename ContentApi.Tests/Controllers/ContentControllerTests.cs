@@ -165,10 +165,6 @@ namespace ContentApi.Tests.Controllers
             var okResult = result as OkResult;
             Assert.NotNull(okResult);
             Assert.Equal(200, okResult.StatusCode);
-            // var apiContents = okObjectResult.Value as ContentViewModel;
-            // Assert.NotNull(apiContents);
-            // Assert.Single(apiContents.Texts);
-            // Assert.Equal(_contentLatest, apiContents.Texts.First());
         }
         
         #endregion
@@ -197,6 +193,27 @@ namespace ContentApi.Tests.Controllers
             Assert.NotNull(apiContents);
             Assert.Single(apiContents.Texts);
             Assert.Equal(_contentTwo, apiContents.Texts.First());
+        }
+        
+        [Fact]
+        public async void FilterContent_GameDoesntExist_ReturnEmptyResponse()
+        {
+            //arrange
+            await using var context = new ContentContext(_dbContextOptions);
+            var controller = CreateController(context);
+            
+            //act
+            var result = await controller.FilterContent(Guid.NewGuid(), new ContentFilterRequest()
+            {
+                Direction = "f",
+                Start = 1,
+                Count = 1
+            });
+            
+            //assert
+            var okResult = result as OkResult;
+            Assert.NotNull(okResult);
+            Assert.Equal(200, okResult.StatusCode);
         }
         
         [Fact]

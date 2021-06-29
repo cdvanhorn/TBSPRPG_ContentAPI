@@ -75,7 +75,9 @@ namespace ContentApi.Controllers {
             try
             {
                 var content = await _contentService.GetPartialContentForGame(gameId, filterRequest);
-                return Ok(new ContentViewModel(content));
+                if(content.Count > 0)
+                    return Ok(new ContentViewModel(content));
+                return Ok();
             }
             catch (Exception e)
             {
