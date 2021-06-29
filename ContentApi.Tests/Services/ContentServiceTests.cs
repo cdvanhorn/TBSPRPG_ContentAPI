@@ -360,5 +360,38 @@ namespace ContentApi.Tests.Services
         }
 
         #endregion
+        
+        #region GetContentForGameAfterPosition
+
+        [Fact]
+        public async void GetContentForGameAfterPosition_EarlyPosition_ReturnContent()
+        {
+            //arrange
+            await using var context = new ContentContext(_dbContextOptions);
+            var service = CreateService(context);
+            
+            //act
+            var contents = await service.GetContentForGameAfterPosition(_testGameId, 40);
+            
+            //assert
+            Assert.Single(contents);
+            Assert.Equal(_contentLatest, contents[0].Text);
+        }
+        
+        [Fact]
+        public async void GetContentForGameAfterPosition_LastPosition_ReturnNoContent()
+        {
+            //arrange
+            await using var context = new ContentContext(_dbContextOptions);
+            var service = CreateService(context);
+            
+            //act
+            var contents = await service.GetContentForGameAfterPosition(_testGameId, 42);
+            
+            //assert
+            Assert.Empty(contents);
+        }
+        
+        #endregion
     }
 }
