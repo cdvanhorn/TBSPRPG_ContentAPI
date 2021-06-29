@@ -14,7 +14,7 @@ namespace ContentApi.Repositories {
         void AddContent(Content content);
         void SaveChanges();
         Task<Content> GetContentForGameWithPosition(Guid gameId, ulong position);
-        Task<List<Content>> GetContentForGameAfterPosition(Guid gameId, ulong? position);
+        Task<List<Content>> GetContentForGameAfterPosition(Guid gameId, ulong position);
     }
 
     public class ContentRepository : ServiceTrackingRepository, IContentRepository {
@@ -64,18 +64,11 @@ namespace ContentApi.Repositories {
                 .FirstOrDefaultAsync(c => c.GameId == gameId && c.Position == position);
         }
 
-        public Task<List<Content>> GetContentForGameAfterPosition(Guid gameId, ulong? position)
+        public Task<List<Content>> GetContentForGameAfterPosition(Guid gameId, ulong position)
         {
-            if (position != null)
-            {
-                return _context.Contents.AsQueryable()
-                    .Where(c => c.GameId == gameId && c.Position > position)
-                    .OrderBy(c => c.Position).ToListAsync();
-            }
-            else
-            {
-                return GetContentForGame(gameId);
-            }
+            return _context.Contents.AsQueryable()
+                .Where(c => c.GameId == gameId && c.Position > position)
+                .OrderBy(c => c.Position).ToListAsync();
         }
     }
 }

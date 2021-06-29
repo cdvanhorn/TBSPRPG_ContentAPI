@@ -270,5 +270,38 @@ namespace ContentApi.Tests.Repositories
         }
 
         #endregion
+
+        #region GetContentForGameAfterPosition
+
+        [Fact]
+        public async void GetContentForGameAfterPosition_EarlyPosition_ReturnContent()
+        {
+            //arrange
+            await using var context = new ContentContext(_dbContextOptions);
+            var repository = new ContentRepository(context);
+            
+            //act
+            var contents = await repository.GetContentForGameAfterPosition(_testGameId, 40);
+            
+            //assert
+            Assert.Single(contents);
+            Assert.Equal("latest content", contents[0].Text);
+        }
+        
+        [Fact]
+        public async void GetContentForGameAfterPosition_LastPosition_ReturnNoContent()
+        {
+            //arrange
+            await using var context = new ContentContext(_dbContextOptions);
+            var repository = new ContentRepository(context);
+            
+            //act
+            var contents = await repository.GetContentForGameAfterPosition(_testGameId, 42);
+            
+            //assert
+            Assert.Empty(contents);
+        }
+
+        #endregion
     }
 }
