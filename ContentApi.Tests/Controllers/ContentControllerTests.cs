@@ -335,5 +335,44 @@ namespace ContentApi.Tests.Controllers
         }
         
         #endregion
+
+        #region GetContentAfterPosition
+
+        [Fact]
+        public async void GetContentAfterPosition_Valid_ReturnsContent()
+        {
+            //arrange
+            await using var context = new ContentContext(_dbContextOptions);
+            var controller = CreateController(context);
+            
+            //act
+            var result = await controller.GetContentAfterPosition(_testGameId, 40);
+
+            //assert
+            var okObjectResult = result as OkObjectResult;
+            Assert.NotNull(okObjectResult);
+            var apiContents = okObjectResult.Value as ContentViewModel;
+            Assert.NotNull(apiContents);
+            Assert.Single(apiContents.Texts);
+            Assert.Equal(_contentLatest, apiContents.Texts.First());
+        }
+        
+        [Fact]
+        public async void GetContentAfterPosition_NoContent_EmptyResponse()
+        {
+            //arrange
+            await using var context = new ContentContext(_dbContextOptions);
+            var controller = CreateController(context);
+            
+            //act
+            var result = await controller.GetContentAfterPosition(_testGameId, 42);
+            
+            //assert
+            var okResult = result as OkResult;
+            Assert.NotNull(okResult);
+            Assert.Equal(200, okResult.StatusCode);
+        }
+
+        #endregion
     }
 }

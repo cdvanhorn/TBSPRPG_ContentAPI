@@ -70,10 +70,9 @@ namespace ContentApi.Controllers {
             return Ok();
         }
         
-        [Authorize, Route("after/{gameId:guid}/{position: ulong}")]
+        [Authorize, Route("{gameId:guid}/after/{position}")]
         public async Task<IActionResult> GetContentAfterPosition(Guid gameId, ulong position) {
             var content = await _contentService.GetContentForGameAfterPosition(gameId, position);
-            //the new game event may not have been handled yet, I should add that to the tests
             if(content.Count > 0)
                 return Ok(new ContentViewModel(content));
             return Ok();
