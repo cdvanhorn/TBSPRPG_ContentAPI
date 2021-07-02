@@ -24,10 +24,12 @@ namespace ContentApi.Adapters
 
         public Location ToLocation(GameAggregate aggregate)
         {
-            return new Location()
-            {
-                CurrentLocation = Guid.Parse(aggregate.MapData.CurrentLocation)
-            };
+            if(aggregate.MapData.CurrentLocation != null)
+                return new Location()
+                {
+                    CurrentLocation = Guid.Parse(aggregate.MapData.CurrentLocation)
+                };
+            return new Location();
         }
     }
 }

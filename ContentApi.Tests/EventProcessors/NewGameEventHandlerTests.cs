@@ -69,10 +69,6 @@ namespace ContentApi.Tests.EventProcessors
                 Settings = new Settings()
                 {
                     Language = Languages.ENGLISH
-                },
-                MapData = new MapData()
-                {
-                    CurrentLocation = Guid.NewGuid().ToString()
                 }
             };
             
@@ -108,11 +104,7 @@ namespace ContentApi.Tests.EventProcessors
             var agg = new GameAggregate()
             {
                 Id = _testGameId.ToString(),
-                AdventureId = adventureId.ToString(),
-                MapData = new MapData()
-                {
-                    CurrentLocation = Guid.NewGuid().ToString()
-                }
+                AdventureId = adventureId.ToString()
             };
             
             var evnt = new GameNewEvent()
