@@ -18,5 +18,9 @@
     <PackageReference Include="TbspRpgLib" Version="1.1.48" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="EventProcessors" />
+  </ItemGroup>
+
 
 </Project>

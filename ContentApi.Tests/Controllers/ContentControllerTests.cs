@@ -17,16 +17,11 @@ namespace ContentApi.Tests.Controllers
     {
         #region Setup
 
-        private readonly Guid _testContentId;
         private readonly Guid _testContentKey = Guid.NewGuid();
-        private readonly Guid _testGameId = Guid.NewGuid();
-        private const string _testEnglishText = "text in english";
-        private readonly string _contentOne = "first content";
-        private readonly string _contentTwo = "second content";
-        private readonly string _contentLatest = "latest content";
+        //private readonly Guid _testGameId = Guid.NewGuid();
+        private const string TestEnglishText = "text in english";
         public ContentControllerTests() : base("ContentControllerTests")
         {
-            _testContentId = Guid.NewGuid();
             Seed();
         }
         
@@ -47,7 +42,7 @@ namespace ContentApi.Tests.Controllers
             {
                 Id = Guid.NewGuid(),
                 ContentKey = _testContentKey,
-                Text = _testEnglishText
+                Text = TestEnglishText
             };
             
             var enSource2 = new En()
@@ -57,188 +52,21 @@ namespace ContentApi.Tests.Controllers
                 Text = "other english text"
             };
 
-            var tc = new Content()
-            {
-                Id = _testContentId,
-                GameId = _testGameId,
-                Position = 42,
-                Text = _contentLatest
-            };
-
-            var tc2 = new Content()
-            {
-                Id = Guid.NewGuid(),
-                GameId = _testGameId,
-                Position = 0,
-                Text = _contentOne
-            };
-
-            var tc3 = new Content()
-            {
-                Id = Guid.NewGuid(),
-                GameId = _testGameId,
-                Position = 1,
-                Text = _contentTwo
-            };
-
-            var tc4 = new Content()
-            {
-                Id = Guid.NewGuid(),
-                GameId = Guid.NewGuid(),
-                Position = 43,
-                Text = "other game content"
-            };
-            
             context.SourcesEn.AddRange(enSource, enSource2);
-            context.Contents.AddRange(tc, tc2, tc3, tc4);
             context.Games.Add(game);
             context.SaveChanges();
         }
 
         private static ContentController CreateController(ContentContext context)
         {
-            var repository = new ContentRepository(context);
             var sourceRepository = new SourceRepository(context);
             var conditionalSourceRepository = new ConditionalSourceRepository(context);
-            var service = new ContentService(repository);
             var sourceService = new SourceService(sourceRepository, conditionalSourceRepository);
-            var gameService = new GameService(new GameRepository(context));
-            return new ContentController(service, sourceService, gameService);
+            return new ContentController(sourceService);
         }
 
         #endregion
-        
-        #region GetContentForGame
 
-        [Fact]
-        public async void GetForGame_GetAllContent()
-        {
-            //arrange
-            await using var context = new ContentContext(_dbContextOptions);
-            var controller = CreateController(context);
-            
-            //act
-            var result = await controller.GetForGame(_testGameId);
-            
-            //assert
-            var okObjectResult = result as OkObjectResult;
-            Assert.NotNull(okObjectResult);
-            var apiContents = okObjectResult.Value as ContentViewModel;
-            Assert.NotNull(apiContents);
-            Assert.Equal(3, apiContents.Texts.Count);
-        }
-        
-        #endregion
-        
-        #region GetLatestForGame
-        
-        [Fact]
-        public async void GetLatestForGame_GetLatestContent()
-        {
-            //arrange
-            await using var context = new ContentContext(_dbContextOptions);
-            var controller = CreateController(context);
-            
-            //act
-            var result = await controller.GetLatestForGame(_testGameId);
-            
-            //assert
-            var okObjectResult = result as OkObjectResult;
-            Assert.NotNull(okObjectResult);
-            var apiContents = okObjectResult.Value as ContentViewModel;
-            Assert.NotNull(apiContents);
-            Assert.Single(apiContents.Texts);
-            Assert.Equal(_contentLatest, apiContents.Texts.First());
-        }
-        
-        [Fact]
-        public async void GetLatestForGame_NoGame_ReturnEmptyReponse()
-        {
-            //arrange
-            await using var context = new ContentContext(_dbContextOptions);
-            var controller = CreateController(context);
-            
-            //act
-            var result = await controller.GetLatestForGame(Guid.NewGuid());
-            
-            //assert
-            var okResult = result as OkResult;
-            Assert.NotNull(okResult);
-            Assert.Equal(200, okResult.StatusCode);
-        }
-        
-        #endregion
-
-        #region FilterContent
-
-        [Fact]
-        public async void FilterContent_Valid_GetRequestedContent()
-        {
-            //arrange
-            await using var context = new ContentContext(_dbContextOptions);
-            var controller = CreateController(context);
-            
-            //act
-            var result = await controller.FilterContent(_testGameId, new ContentFilterRequest()
-            {
-                Direction = "f",
-                Start = 1,
-                Count = 1
-            });
-            
-            //assert
-            var okObjectResult = result as OkObjectResult;
-            Assert.NotNull(okObjectResult);
-            var apiContents = okObjectResult.Value as ContentViewModel;
-            Assert.NotNull(apiContents);
-            Assert.Single(apiContents.Texts);
-            Assert.Equal(_contentTwo, apiContents.Texts.First());
-        }
-        
-        [Fact]
-        public async void FilterContent_GameDoesntExist_ReturnEmptyResponse()
-        {
-            //arrange
-            await using var context = new ContentContext(_dbContextOptions);
-            var controller = CreateController(context);
-            
-            //act
-            var result = await controller.FilterContent(Guid.NewGuid(), new ContentFilterRequest()
-            {
-                Direction = "f",
-                Start = 1,
-                Count = 1
-            });
-            
-            //assert
-            var okResult = result as OkResult;
-            Assert.NotNull(okResult);
-            Assert.Equal(200, okResult.StatusCode);
-        }
-        
-        [Fact]
-        public async void FilterContent_BadDirection_ReturnBadRequest()
-        {
-            //arrange
-            await using var context = new ContentContext(_dbContextOptions);
-            var controller = CreateController(context);
-            
-            //act
-            var result = await controller.FilterContent(_testGameId, new ContentFilterRequest()
-            {
-                Direction = "zebra",
-                Start = 2,
-                Count = 2
-            });
-            
-            //assert
-            var badRequestResult = result as BadRequestObjectResult;
-            Assert.NotNull(badRequestResult);
-            Assert.Equal(400, badRequestResult.StatusCode);
-        }
-
-        #endregion
-        
         #region GetSourceContent
 
         [Fact]
@@ -258,29 +86,9 @@ namespace ContentApi.Tests.Controllers
             Assert.NotNull(sourceViewModel);
             Assert.Equal(_testContentKey, sourceViewModel.Id);
             Assert.Equal("en", sourceViewModel.Language);
-            Assert.Equal(_testEnglishText, sourceViewModel.Source);
+            Assert.Equal(TestEnglishText, sourceViewModel.Source);
         }
-        
-        [Fact]
-        public async void GetSourceContent_ValidGame_ReturnSource()
-        {
-            //arrange
-            await using var context = new ContentContext(_dbContextOptions);
-            var controller = CreateController(context);
-            
-            //act
-            var result = await controller.GetSourceContent(_testGameId, _testContentKey);
 
-            //assert
-            var okObjectResult = result as OkObjectResult;
-            Assert.NotNull(okObjectResult);
-            var sourceViewModel = okObjectResult.Value as SourceViewModel;
-            Assert.NotNull(sourceViewModel);
-            Assert.Equal(_testContentKey, sourceViewModel.Id);
-            Assert.Equal("en", sourceViewModel.Language);
-            Assert.Equal(_testEnglishText, sourceViewModel.Source);
-        }
-        
         [Fact]
         public async void GetSourceContent_InValidLanguage_ReturnError()
         {
@@ -296,23 +104,7 @@ namespace ContentApi.Tests.Controllers
             Assert.NotNull(badRequestResult);
             Assert.Equal(400, badRequestResult.StatusCode);
         }
-        
-        [Fact]
-        public async void GetSourceContent_InValidGame_ReturnError()
-        {
-            //arrange
-            await using var context = new ContentContext(_dbContextOptions);
-            var controller = CreateController(context);
-            
-            //act
-            var result = await controller.GetSourceContent(Guid.NewGuid(), _testContentKey);
 
-            //assert
-            var badRequestResult = result as BadRequestObjectResult;
-            Assert.NotNull(badRequestResult);
-            Assert.Equal(400, badRequestResult.StatusCode);
-        }
-        
         [Fact]
         public async void GetSourceContent_InValidKey_ReturnSourceError()
         {
@@ -334,45 +126,6 @@ namespace ContentApi.Tests.Controllers
             Assert.Equal($"invalid source key {invalidKey}", sourceViewModel.Source);
         }
         
-        #endregion
-
-        #region GetContentAfterPosition
-
-        [Fact]
-        public async void GetContentAfterPosition_Valid_ReturnsContent()
-        {
-            //arrange
-            await using var context = new ContentContext(_dbContextOptions);
-            var controller = CreateController(context);
-            
-            //act
-            var result = await controller.GetContentAfterPosition(_testGameId, 40);
-
-            //assert
-            var okObjectResult = result as OkObjectResult;
-            Assert.NotNull(okObjectResult);
-            var apiContents = okObjectResult.Value as ContentViewModel;
-            Assert.NotNull(apiContents);
-            Assert.Single(apiContents.Texts);
-            Assert.Equal(_contentLatest, apiContents.Texts.First());
-        }
-        
-        [Fact]
-        public async void GetContentAfterPosition_NoContent_EmptyResponse()
-        {
-            //arrange
-            await using var context = new ContentContext(_dbContextOptions);
-            var controller = CreateController(context);
-            
-            //act
-            var result = await controller.GetContentAfterPosition(_testGameId, 42);
-            
-            //assert
-            var okResult = result as OkResult;
-            Assert.NotNull(okResult);
-            Assert.Equal(200, okResult.StatusCode);
-        }
-
         #endregion
     }
 }
